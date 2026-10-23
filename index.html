@@ -1,0 +1,1380 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>SG-SST JMA en Obra</title>
+<meta name="theme-color" content="#134680">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="SG-SST JMA">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="img/icon-192.png">
+<link rel="apple-touch-icon" href="img/icon-192.png">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}#syncchip span{display:inline!important}#syncchip{padding:4px 10px!important;font-family:inherit}</style>
+<script>window.SGSST_PROD=true</script>
+</head>
+<body>
+
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&display=swap">
+<style>
+/* Layout: app de campo a una columna sobre blanco (identidad J.M.A), barra superior con logotipo, pasos con botones grandes y barra de acción inferior.
+   Tema único claro por decisión de marca: el manual de J.M.A define solo fondo blanco y se lee mejor a pleno sol en obra. */
+:root{
+  color-scheme:light;
+  --azul:#134680; --rojo:#d51631; --amarillo:#f6b312; --verde:#45a82d;
+  --negro:#000000; --blanco:#ffffff; --gris-texto:#414141;
+  --tinte-amarillo:#fef8ec; --tinte-verde:#f0f5ee; --tinte-rosa:#f9eef2;
+  --bg:#ffffff; --surface:#ffffff; --surface-2:#f5f7fa; --line:#d9dee6;
+  --fg:var(--negro); --muted:var(--gris-texto);
+  --font-sans:Ubuntu,"Segoe UI",system-ui,sans-serif;
+  --radius-sm:4px; --radius-md:8px; --radius-pill:999px;
+}
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-sans);font-size:16px;line-height:1.5;-webkit-tap-highlight-color:transparent;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--blanco)}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--azul);outline-offset:2px}
+.wrap{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+/* barra superior */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--blanco);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:12px;padding-block:8px;min-height:60px}
+.brand{display:flex;align-items:center;gap:12px;min-width:0;flex:1}
+.brand img{height:40px;width:auto;flex:none}
+.brand .ph{height:40px;padding:0 10px;border:1px dashed var(--line);border-radius:var(--radius-sm);display:grid;place-items:center;font-size:11px;color:var(--muted);flex:none}
+.brand .t{min-width:0;border-left:1px solid var(--line);padding-left:12px}
+.brand b{font-size:15px;font-weight:700;color:var(--azul);display:block;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brand small{display:block;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.net{font-size:12px;font-weight:500;padding:4px 10px;border-radius:var(--radius-pill);background:var(--tinte-verde);white-space:nowrap;display:flex;align-items:center;gap:6px}
+.net i{width:8px;height:8px;border-radius:50%;background:var(--verde)}
+.net.off{background:var(--tinte-amarillo)}
+.net.off i{background:var(--amarillo)}
+.iconbtn{background:transparent;border:0;color:var(--azul);padding:8px;border-radius:var(--radius-md);font-size:14px;font-weight:500}
+@media (max-width:420px){.brand .t{display:none}.net span{display:none}.net{padding:6px}}
+
+main{padding-block:20px 128px;position:relative}
+h1,h2,h3{text-wrap:balance;margin:0;font-weight:700}
+h1{font-size:24px;line-height:32px;color:var(--azul)}
+h2{font-size:14px;line-height:20px;letter-spacing:.08em;text-transform:uppercase;color:var(--azul);font-weight:700}
+h3{font-size:18px;line-height:26px;font-weight:500}
+.eyebrow{font-size:12px;line-height:16px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.code{font-variant-numeric:tabular-nums;font-weight:500;letter-spacing:.02em}
+.muted{color:var(--muted)}
+.stack{display:flex;flex-direction:column;gap:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-md);padding:16px;display:flex;flex-direction:column;gap:16px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:50px;padding:0 20px;border-radius:var(--radius-pill);border:1.5px solid var(--azul);background:var(--blanco);color:var(--azul);font-weight:500;font-size:16px;text-align:center}
+.btn.primary{background:var(--azul);color:var(--blanco)}
+.btn.block{width:100%}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.small{min-height:40px;padding:0 16px;font-size:14px}
+.link{background:none;border:0;color:var(--azul);font-weight:500;padding:6px 0;text-decoration:underline;text-underline-offset:3px;font-size:14px}
+
+/* círculos de tinte (eco de los tres pilares) */
+.tints{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:-1}
+.tints i{position:absolute;border-radius:50%}
+.tints .a{width:360px;height:360px;background:var(--tinte-amarillo);right:-140px;top:-90px}
+.tints .b{width:240px;height:240px;background:var(--tinte-verde);left:-120px;top:280px}
+
+/* ingreso */
+.login{max-width:420px;margin:16px auto 0}
+.login .logo-big{display:flex;justify-content:center;padding-block:8px 4px}
+.login .logo-big img{height:120px;width:auto}
+.demo-hint{font-size:14px;line-height:20px;background:var(--tinte-amarillo);border-radius:var(--radius-md);padding:12px}
+
+/* campos */
+label.f,.f{display:flex;flex-direction:column;gap:8px;font-weight:500;font-size:14px;min-width:0}
+.req::after{content:" *";color:var(--rojo)}
+.in{width:100%;min-height:50px;padding:10px 12px;border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--surface-2);font-size:16px}
+textarea.in{min-height:88px;resize:vertical}
+select.in{appearance:auto}
+.in:focus{border-color:var(--azul);outline:none;box-shadow:0 0 0 2px var(--azul)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:480px){.grid2{grid-template-columns:1fr}}
+.seg{display:flex;border:1.5px solid var(--azul);border-radius:var(--radius-pill);overflow:hidden}
+.seg button{flex:1;min-height:48px;border:0;background:transparent;font-weight:500;font-size:15px;color:var(--azul)}
+.seg button+button{border-left:1.5px solid var(--azul)}
+.seg button[aria-pressed="true"]{background:var(--azul);color:var(--blanco)}
+
+/* inicio */
+.newgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:520px){.newgrid{grid-template-columns:1fr}}
+.newcard{display:flex;gap:12px;align-items:center;text-align:left;width:100%;background:var(--blanco);border:1.5px solid var(--azul);border-radius:var(--radius-md);padding:16px;min-width:0}
+.newcard .plus{width:44px;height:44px;border-radius:50%;background:var(--azul);color:var(--blanco);display:grid;place-items:center;font-size:26px;font-weight:500;flex:none;line-height:1}
+.newcard.ats .plus{background:var(--rojo)}
+.newcard b{font-size:16px;line-height:22px;display:block;color:var(--azul)}
+.newcard .code{font-size:12px;color:var(--muted)}
+.modules{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.mod{background:var(--surface-2);border-radius:var(--radius-md);padding:12px;min-width:0;display:flex;flex-direction:column;gap:4px}
+.mod b{font-size:14px;line-height:20px;font-weight:500}
+.mod .code{font-size:12px;color:var(--muted)}
+.pill{display:inline-block;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;padding:3px 10px;border-radius:var(--radius-pill);white-space:nowrap}
+.pill.borrador{background:var(--surface-2);color:var(--gris-texto);border:1px solid var(--line)}
+.pill.abierto,.pill.vigente{background:var(--amarillo);color:var(--negro)}
+.pill.cerrado{background:var(--verde);color:var(--negro)}
+.pill.ej{background:var(--tinte-rosa);color:var(--gris-texto)}
+.pill.tipo{background:var(--azul);color:var(--blanco)}
+.pill.tipo.ats{background:var(--rojo)}
+.plist{display:flex;flex-direction:column;gap:8px}
+.pitem{display:flex;gap:12px;align-items:center;width:100%;text-align:left;background:var(--blanco);border:1px solid var(--line);border-radius:var(--radius-md);padding:14px}
+.pitem .main{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.pitem .main b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500}
+.pitem .sub{font-size:13px;color:var(--muted)}
+.pitem .chev{color:var(--azul);font-size:22px}
+.tags{display:flex;flex-direction:column;gap:4px;align-items:flex-end}
+
+/* pasos */
+.stephead{display:flex;flex-direction:column;gap:12px;margin-bottom:16px}
+.progress{display:flex;gap:4px}
+.progress i{flex:1;height:6px;border-radius:var(--radius-pill);background:var(--line)}
+.progress i.done{background:var(--azul)}
+.progress i.cur{background:var(--amarillo)}
+.saved{font-size:13px;color:var(--muted);display:flex;gap:6px;align-items:center}
+.saved::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--verde)}
+
+/* preguntas */
+.items{display:flex;flex-direction:column;gap:8px}
+.item{background:var(--blanco);border:1px solid var(--line);border-radius:var(--radius-md);padding:14px;display:flex;flex-direction:column;gap:12px;border-left-width:6px}
+.item.v-si{border-left-color:var(--verde)}
+.item.v-no{border-left-color:var(--rojo);background:var(--tinte-rosa)}
+.item.v-na{border-left-color:var(--gris-texto)}
+.item p{margin:0;font-weight:500}
+.new{font-size:11px;font-weight:500;color:var(--azul);background:var(--tinte-amarillo);border-radius:var(--radius-sm);padding:2px 6px;margin-left:6px;white-space:nowrap}
+.tag-cond{font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--rojo)}
+.tri{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tri button{min-height:52px;border-radius:var(--radius-pill);border:1.5px solid var(--line);background:var(--surface-2);font-weight:700;font-size:16px}
+.tri button[data-v="si"][aria-pressed="true"]{background:var(--verde);border-color:var(--verde);color:var(--negro)}
+.tri button[data-v="no"][aria-pressed="true"]{background:var(--rojo);border-color:var(--rojo);color:var(--blanco)}
+.tri button[data-v="na"][aria-pressed="true"]{background:var(--gris-texto);border-color:var(--gris-texto);color:var(--blanco)}
+.obs{font-size:14px;min-height:44px}
+.no-msg{font-size:14px;line-height:20px;color:var(--rojo);font-weight:500;margin:0}
+.allsi{display:flex;justify-content:flex-end}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{min-height:46px;padding:0 16px;border-radius:var(--radius-pill);border:1.5px solid var(--line);background:var(--blanco);font-weight:500;text-align:left}
+.chip[aria-pressed="true"]{background:var(--azul);border-color:var(--azul);color:var(--blanco)}
+.subhead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px}
+
+/* matriz de peligros */
+.etapa{background:var(--blanco);border:1px solid var(--line);border-radius:var(--radius-md);padding:14px;display:flex;flex-direction:column;gap:12px}
+.etapa .eh{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.etapa .num{width:28px;height:28px;border-radius:50%;background:var(--azul);color:var(--blanco);display:grid;place-items:center;font-size:13px;font-weight:700;flex:none}
+.etapa textarea.in{min-height:64px}
+.lib{background:var(--tinte-amarillo);border-radius:var(--radius-md);padding:16px;display:flex;flex-direction:column;gap:12px}
+
+/* firmas */
+.sigbox{min-height:110px;border:2px dashed var(--line);border-radius:var(--radius-md);background:var(--surface-2);display:grid;place-items:center;width:100%;color:var(--azul);font-weight:500;padding:6px}
+.sigbox img{max-height:96px}
+.sigbox.has{border-style:solid;border-color:var(--verde);background:var(--blanco)}
+.decl{font-size:14px;line-height:20px;background:var(--surface-2);border-radius:var(--radius-md);padding:12px;margin:0}
+.worker{border-top:1px solid var(--line);padding-top:16px;display:flex;flex-direction:column;gap:12px}
+.worker:first-of-type{border-top:0;padding-top:0}
+.whead{display:flex;justify-content:space-between;align-items:center}
+.days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.day{min-height:56px;border-radius:var(--radius-md);border:1.5px solid var(--line);background:var(--surface-2);font-size:12px;font-weight:500;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:2px}
+.day.today{border-color:var(--azul)}
+.day.done{background:var(--verde);border-color:var(--verde);color:var(--negro)}
+.day:disabled{opacity:.35;cursor:not-allowed}
+
+/* revisión */
+.issue{display:flex;gap:10px;align-items:flex-start;padding:12px;border-radius:var(--radius-md);background:var(--tinte-rosa);color:var(--fg);font-size:14px;line-height:20px;border:0;text-align:left;width:100%}
+.issue b{color:var(--rojo)}
+.okbox{padding:16px;border-radius:var(--radius-md);background:var(--tinte-verde);font-weight:500}
+.tally{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
+.tally div{background:var(--surface-2);border-radius:var(--radius-md);padding:12px 4px;font-size:14px}
+.tally b{display:block;font-size:28px;line-height:32px;font-variant-numeric:tabular-nums}
+
+/* barra inferior */
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--blanco);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+.bar .wrap{display:flex;gap:8px;padding-block:10px}
+.bar .btn{flex:1}
+
+/* firma a pantalla completa */
+.modal{position:fixed;inset:0;z-index:20;background:var(--blanco);display:flex;flex-direction:column;padding:calc(env(safe-area-inset-top,0px) + 12px) max(16px,env(safe-area-inset-right,0px)) calc(env(safe-area-inset-bottom,0px) + 12px) max(16px,env(safe-area-inset-left,0px));gap:12px}
+.modal canvas{flex:1;width:100%;background:var(--blanco);border:2px solid var(--azul);border-radius:var(--radius-md);touch-action:none;min-height:200px}
+.modal .row .btn{flex:1}
+
+/* registro (vista del PDF) */
+.doc{background:var(--blanco);color:var(--negro);border:1px solid var(--line);border-radius:var(--radius-sm);padding:14px;font-size:12px;line-height:1.35}
+.doc table{width:100%;border-collapse:collapse}
+.doc td,.doc th{border:1px solid #8a8f96;padding:4px 6px;vertical-align:top;text-align:left}
+.doc th{background:var(--azul);color:var(--blanco);font-size:11px;font-weight:500;letter-spacing:.04em;text-transform:uppercase}
+.doc .hdr td{text-align:center;vertical-align:middle}
+.doc .hdr img{max-height:56px;width:auto}
+.doc .ttl{font-weight:700;font-size:13px}
+.doc .sec{margin-top:10px}
+.doc .c{text-align:center;width:36px;font-weight:700}
+.doc .no{color:var(--rojo)}
+.doc img{max-height:44px}
+.doc .dsig img{max-height:30px}
+.docwrap{overflow-x:auto}
+.docwrap .doc{min-width:600px}
+.note{font-size:14px;line-height:20px;border-left:4px solid var(--azul);background:var(--surface-2);padding:12px;border-radius:0 var(--radius-md) var(--radius-md) 0;margin:0}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 86px);background:var(--azul);color:var(--blanco);padding:10px 18px;border-radius:var(--radius-pill);font-weight:500;z-index:30;font-size:14px;max-width:calc(100% - 32px);text-align:center}
+.photo{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.photo img{width:96px;height:72px;object-fit:cover;border-radius:var(--radius-md);border:1px solid var(--line)}
+.quick{display:flex;flex-wrap:wrap;gap:8px}
+.quick button{border:1px solid var(--line);background:var(--tinte-verde);border-radius:var(--radius-pill);padding:8px 14px;font-size:14px;text-align:left}
+/* inspecciones y equipos */
+.pill.apto{background:var(--verde);color:var(--negro)}
+.pill.fuera{background:var(--amarillo);color:var(--negro)}
+.pill.baja{background:var(--rojo);color:var(--blanco)}
+.pill.venc{background:var(--tinte-rosa);color:var(--rojo);border:1px solid var(--rojo)}
+.pill.prox{background:var(--tinte-amarillo);color:var(--gris-texto);border:1px solid var(--amarillo)}
+.pill.cat{background:var(--surface-2);color:var(--azul);border:1px solid var(--line)}
+.eqitem{display:flex;gap:12px;align-items:center;width:100%;text-align:left;background:var(--blanco);border:1px solid var(--line);border-radius:var(--radius-md);padding:12px}
+.eqitem .thumb{width:56px;height:56px;border-radius:var(--radius-md);background:var(--surface-2);object-fit:cover;flex:none;display:grid;place-items:center;font-size:11px;color:var(--muted);font-weight:500;text-align:center;overflow:hidden}
+.eqitem .main{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.eqitem .main b{font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.eqitem .code{font-size:13px;color:var(--azul)}
+.search{display:flex;gap:8px}
+.search .in{flex:1}
+.hv{display:grid;grid-template-columns:140px 1fr;gap:16px;align-items:start}
+@media (max-width:480px){.hv{grid-template-columns:1fr}}
+.hv .ph{width:100%;aspect-ratio:1;max-width:100%;border-radius:var(--radius-md);object-fit:cover;background:var(--surface-2);display:grid;place-items:center;color:var(--muted);font-size:13px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:14px;margin:0}
+.kv dt{color:var(--muted)}
+.kv dd{margin:0;font-weight:500;min-width:0;overflow-wrap:anywhere}
+.qrwrap{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.qrbox{background:var(--blanco);padding:8px;border:1px solid var(--line);border-radius:var(--radius-md);width:148px;height:148px;flex:none}
+.qrbox img,.qrbox canvas{width:130px!important;height:130px!important}
+.hist{display:flex;flex-direction:column;gap:8px}
+.hist button{display:flex;justify-content:space-between;gap:8px;align-items:center;background:var(--surface-2);border:0;border-radius:var(--radius-md);padding:12px;text-align:left;width:100%}
+.kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+@media (max-width:480px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.kpi{border-radius:var(--radius-md);padding:14px;background:var(--surface-2);display:flex;flex-direction:column;gap:2px;border-top:4px solid var(--line);text-align:left;border-left:0;border-right:0;border-bottom:0}
+.kpi b{font-size:30px;line-height:36px;font-variant-numeric:tabular-nums}
+.kpi span{font-size:13px;line-height:18px;color:var(--gris-texto)}
+.kpi.k-ok{border-top-color:var(--verde)}.kpi.k-warn{border-top-color:var(--amarillo)}.kpi.k-bad{border-top-color:var(--rojo)}.kpi.k-az{border-top-color:var(--azul)}
+.barcat{display:flex;flex-direction:column;gap:10px}
+.barcat .r{display:grid;grid-template-columns:110px 1fr 34px;gap:10px;align-items:center;font-size:14px}
+.barcat .track{display:flex;height:14px;border-radius:var(--radius-pill);overflow:hidden;background:var(--surface-2)}
+.barcat .track i{display:block;height:100%}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--gris-texto)}
+.legend span{display:flex;align-items:center;gap:6px}
+.legend i{width:10px;height:10px;border-radius:50%;display:block}
+.result{border-radius:var(--radius-md);padding:16px;display:flex;flex-direction:column;gap:8px}
+.result.ok{background:var(--tinte-verde);border-left:6px solid var(--verde)}
+.result.bad{background:var(--tinte-rosa);border-left:6px solid var(--rojo)}
+.result b{font-size:18px}
+.tri.cnc button[data-v="c"][aria-pressed="true"]{background:var(--verde);border-color:var(--verde);color:var(--negro)}
+.tri.cnc button[data-v="nc"][aria-pressed="true"]{background:var(--rojo);border-color:var(--rojo);color:var(--blanco)}
+.tri.cnc button[data-v="na"][aria-pressed="true"]{background:var(--gris-texto);border-color:var(--gris-texto);color:var(--blanco)}
+.item.v-c{border-left-color:var(--verde)}
+.item.v-nc{border-left-color:var(--rojo);background:var(--tinte-rosa)}
+@media (prefers-reduced-motion:no-preference){.item,.btn,.tri button,.chip,.day{transition:background-color .15s,border-color .15s}}
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand"><span id="logo-top"></span><div class="t"><b>SG-SST</b><small id="who">Permisos e inspecciones en obra</small></div></div>
+    <div class="net" id="net"><i></i><span>En línea</span></div>
+    <button class="iconbtn" id="logout" hidden>Salir</button>
+  </div>
+</header>
+<main class="wrap" id="app"></main>
+<div class="bar" id="bar" hidden><div class="wrap" id="barin"></div></div>
+<div class="toast" id="toast" hidden></div>
+
+<script src="vendor/qrcode.min.js"></script>
+<script src="vendor/jsQR.js"></script>
+<script>
+/* ---------- logotipo oficial (imagen del sistema de diseño J.M.A; nunca se recompone con texto) ---------- */
+const PROD = !!window.SGSST_PROD;   /* true en la app instalada (GitHub Pages) */
+const LOGO_H = PROD?'img/jma-horizontal.png':'/_blob/1c5d872573276fd12ce92c9ce8b5e6fb';   /* jma-horizontal.png */
+const LOGO_V = PROD?'img/jma-principal.png':'/_blob/c622db9e2516ac34307bde3e6f3633e5';   /* jma-principal.png */
+const logoImg=(src,alt,ph)=>src?`<img src="${src}" alt="${alt}" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'ph',textContent:'${ph}'}))">`:`<span class="ph">${ph}</span>`;
+
+/* ---------- contenido: FT-SST-091 Permiso de trabajo en alturas ---------- */
+const NR=' · Res. 4272/2021';
+const ALT = {
+  entorno:{t:'Análisis del entorno de trabajo',items:[
+    'El sitio de trabajo está libre de lluvia, tormenta eléctrica, vientos fuertes u otra condición adversa',
+    'El lugar de trabajo está en orden y aseo para ejecutar la labor',
+    'Los trabajos en áreas adyacentes NO generan riesgo sobre esta tarea',
+    'Se analizaron los peligros y controles por trabajos adyacentes',
+    'Se informó al personal autorizado sobre otras actividades en el área (eléctrica, izaje, etc.)',
+    'Si hay líneas energizadas cerca, se elaboró permiso de riesgo eléctrico',
+    'Se instaló señalización adecuada para delimitar el área de trabajo']},
+  verif:{t:'Lista de verificación de trabajo en alturas',items:[
+    'Se cuenta con procedimiento de trabajo en alturas divulgado al personal',
+    'Se cuenta con procedimiento de rescate en caso de emergencia',
+    'La línea de vida y los puntos de anclaje están en buen estado',
+    'La línea de seguridad está anclada a un soporte diferente a la estructura donde trabajan',
+    'Hay medidas para el manejo de herramientas con posibilidad de caída',
+    'La actividad se realiza mínimo entre dos personas',
+    'Los trabajadores tienen certificado de capacitación o reentrenamiento vigente',
+    'Los trabajadores tienen concepto médico de aptitud para alturas vigente',
+    'Los trabajadores están afiliados a seguridad social integral (EPS, ARL, pensión)',
+    'Existen barandas de mínimo 1 metro en el borde de la superficie (cuando aplique)',
+    {t:'Se calculó la distancia de caída libre requerida y el espacio es suficiente',n:NR},
+    {t:'El coordinador de trabajo en alturas permanece en el área durante la tarea',n:NR}]},
+  epp:{t:'Equipos y elementos de protección personal',items:[
+    'El equipo contra caídas (arnés, eslingas, conectores) fue inspeccionado antes de usarlo (FT-SST-057)',
+    'Los trabajadores tienen casco con barbuquejo','Los trabajadores tienen gafas de seguridad','Los trabajadores tienen botas de seguridad',
+    {t:'Los trabajadores tienen guantes adecuados para la tarea',n:NR},
+    'Se cuenta con kit de rescate para trabajo en alturas']},
+  andamio:{t:'Andamios',items:['El andamio cuenta con certificado','La estructura del andamio es estable y metálica','Está en buenas condiciones, completo y nivelado','Todos los parales están debidamente anclados','El piso de apoyo está firme y bien nivelado','Si tiene más de tres secciones, tiene vientos instalados','Si es rodante, tiene el seguro en posición de bloqueo','La plataforma está completa y cubre la dimensión del andamio','La plataforma tiene barandas en buen estado','Existe línea de vida asegurada e independiente al andamio','Si es colgante, las poleas están lubricadas y en buen estado','El sistema de sujeción del andamio colgante está asegurado','Están instalados los guardapiés']},
+  escalera:{t:'Escaleras',items:['La distancia entre escalones es la misma y de máximo 40 cm','Los pasos están en buen estado','Los largueros miden máximo 5 m (sin extensión)','Sobresale mínimo 1 m sobre su apoyo superior','Está apoyada sobre una superficie firme','Las uniones entre paso y paral están en óptimo estado','La escalera está amarrada, o hay un ayudante que la sostiene','Las zapatas están en buen estado','Es de material dieléctrico (si se requiere)','La cuerda de la extensión está amarrada y en buen estado','La distancia de la pared a la base es 1/4 de la longitud','La escalera de tijera tiene tensores en óptimo estado']},
+  canasta:{t:'Elevador / grúa canasta',items:['La canasta está en buen estado','El operador tiene certificado de competencia o experiencia','Aparejos, eslingas y estrobos sin desgaste excesivo','Los aparejos cumplen la capacidad de cargue y están certificados','El ángulo de pluma es adecuado (tabla extensión vs. carga)','Se realizó inspección preoperacional del equipo','Se demarcó el área (mínimo 3 m de radio de operación)']}
+};
+const ACCESS=[['andamio','Andamio'],['escalera','Escalera'],['canasta','Elevador / canasta']];
+const ALT_STEPS=['Datos de la tarea','Entorno','Verificación','EPP','Sistema de acceso','Firmas y personal','Revisión'];
+const CIERRE=['El área queda limpia y libre de residuos y materiales','Se terminó satisfactoriamente el trabajo','No hubo incidentes ni accidentes de trabajo'];
+const OBS_OK='Se finalizan las labores programadas sin presentarse ningún incidente o accidente.';
+
+/* ---------- contenido: FT-SST-094 Análisis de seguridad en el trabajo (ATS) ---------- */
+const PROCS=[['civil','Construcción civil general'],['mant','Mantenimiento rutinario'],['quim','Manejo de químicos'],['izaje','Izaje de cargas'],['loto','Bloqueo eléctrico / mecánico (LOTO)'],['alturas','Trabajo en alturas'],['confinado','Espacios confinados'],['excav','Excavaciones / zanjas'],['caliente','Trabajo en caliente'],['otro','Otro procedimiento']];
+const ATS_GEN=[
+  '¿Se identificó el riesgo más crítico de la actividad según la GTC 45?',
+  '¿Se evaluaron las condiciones de trabajo (ruido, espacio, iluminación, polvo)?',
+  '¿Se identificaron aspectos ambientales (residuos, derrames)?',
+  '¿Se identificó el EPP básico y específico, y está en buen estado?',
+  '¿El personal está capacitado y apto para realizar esta labor?',
+  '¿Se coordinaron interferencias con otras áreas o cuadrillas?',
+  '¿Las herramientas y equipos están inspeccionados y aptos para el uso? (FT-SST-057)',
+  '¿El área está limpia, despejada y ordenada para iniciar?'];
+const ATS_COND={
+  alturas:['Alturas',['¿Se evaluaron andamios, accesos o líneas de vida (Res. 4272/2021)?','¿Los andamios o equipos de elevación están certificados?',{t:'¿Se diligenció el permiso de trabajo en alturas FT-SST-091?',n:' '}]],
+  caliente:['Trabajo en caliente',['¿Se cuenta con equipo de extinción de incendios a la mano?','¿El extintor está cargado y vigente?',{t:'¿Se diligenció el permiso de trabajo en caliente FT-SST-111?',n:' '}]],
+  confinado:['Espacio confinado',[{t:'¿Se diligenció el permiso FT-SST-115 y se midió la atmósfera antes de ingresar?',n:' '},{t:'¿Hay vigía permanente en la entrada y plan de rescate?',n:' '}]],
+  excav:['Excavaciones',[{t:'¿Se identificaron redes subterráneas (eléctricas, gas, acueducto) antes de excavar?',n:' '},{t:'¿Se diligenció la lista FT-SST-110 y el permiso FT-SST-116?',n:' '}]],
+  loto:['Energías peligrosas',[{t:'¿Se aplicó bloqueo y etiquetado y se verificó energía cero?',n:' '},{t:'¿Se diligenció el permiso de energías peligrosas FT-SST-117?',n:' '}]],
+  izaje:['Izaje de cargas',[{t:'¿El operador y el aparejador están certificados?',n:' '},{t:'¿Se inspeccionaron aparejos y se conoce el peso de la carga?',n:' '}]],
+  quim:['Químicos',[{t:'¿Se cuenta con las fichas de datos de seguridad (FDS) y el rotulado SGA?',n:' '}]]
+};
+const GTC=['Condiciones de seguridad','Físico','Químico','Biológico','Biomecánico','Psicosocial','Fenómenos naturales'];
+const LIB={
+ 'Armado y desarme de andamio':[['Transporte y alistamiento de cuerpos de andamio','Biomecánico','Sobreesfuerzo por levantamiento de cargas: lesiones lumbares','Levantar entre dos personas, técnica de levantamiento seguro, máximo 25 kg por persona'],['Armado de cuerpos y plataformas','Condiciones de seguridad','Caída de distinto nivel: fracturas, muerte','Permiso FT-SST-091, arnés anclado a línea de vida independiente, coordinador presente'],['Instalación de crucetas, rodapiés y barandas','Condiciones de seguridad','Caída de objetos: golpes a personal abajo','Demarcar área inferior, herramientas amarradas, casco con barbuquejo']],
+ 'Excavación manual':[['Localización y replanteo','Condiciones de seguridad','Contacto con redes enterradas: electrocución','Consultar planos de redes, sondeos manuales, señalización'],['Excavación con pala y barra','Biomecánico','Posturas forzadas y movimientos repetitivos: lesiones osteomusculares','Pausas activas, rotación de tareas, herramienta en buen estado'],['Profundización mayor a 1,5 m','Condiciones de seguridad','Derrumbe de paredes: atrapamiento','Entibado o talud, escalera de acceso, material retirado a 60 cm del borde']],
+ 'Fundida de concreto':[['Preparación y transporte de mezcla','Químico','Contacto con cemento: dermatitis, quemaduras químicas','Guantes de nitrilo, botas de caucho, gafas, lavado de manos'],['Vaciado en placa o columna','Condiciones de seguridad','Caída al mismo nivel por superficies irregulares','Orden y aseo, pasarelas, iluminación adecuada'],['Vibrado del concreto','Físico','Vibración y ruido: lesiones vasculares, hipoacusia','Protección auditiva, rotación del operador, equipo con mantenimiento']],
+ 'Corte con pulidora':[['Inspección de la herramienta','Condiciones de seguridad','Herramienta defectuosa: cortes, contacto eléctrico','Inspección preuso FT-SST-057, guarda instalada, disco adecuado'],['Corte de material','Condiciones de seguridad','Proyección de partículas y rotura de disco: lesiones oculares y cortes','Careta y gafas, guantes anticorte, posición fuera de la línea del disco'],['Corte continuo','Físico','Ruido: hipoacusia','Protección auditiva tipo copa, delimitar área']],
+ 'Soldadura eléctrica':[['Ubicación del equipo','Condiciones de seguridad','Contacto eléctrico indirecto: quemaduras, electrocución','Cables sin empalmes, conexión a tierra, equipo en área seca'],['Soldadura','Físico','Radiación no ionizante: lesiones oculares y de piel','Careta con filtro, peto, mangas y guantes de carnaza, biombos'],['Soldadura cerca de material combustible','Condiciones de seguridad','Incendio por chispas','Permiso FT-SST-111, extintor a la mano, retirar combustibles, vigía de fuego']],
+ 'Instalación eléctrica y conexión de tableros':[['Desenergización del circuito','Condiciones de seguridad','Contacto eléctrico directo: electrocución','Bloqueo y etiquetado (LOTO), verificar ausencia de tensión, permiso FT-SST-117'],['Conexión y peinado de cables','Condiciones de seguridad','Arco eléctrico: quemaduras','Herramienta aislada, EPP dieléctrico, personal calificado'],['Pruebas de energización','Condiciones de seguridad','Energización inesperada','Comunicación entre cuadrillas, retiro de candados solo por quien los instaló']],
+ 'Mampostería y pañete':[['Transporte de bloques y mezcla','Biomecánico','Manipulación de cargas: lesiones lumbares','Uso de carretilla, cargas compartidas, técnica de levantamiento'],['Levante de muro sobre andamio','Condiciones de seguridad','Caída de distinto nivel','Andamio certificado, barandas, arnés si supera 2 m sin protección colectiva'],['Aplicación de pañete','Químico','Contacto con mezcla: irritación de piel y ojos','Guantes, gafas, ropa de manga larga']],
+ 'Cargue y descargue de materiales':[['Recepción del vehículo','Condiciones de seguridad','Atropellamiento por maniobras del vehículo','Señalero, zona demarcada, vehículo apagado y frenado'],['Descargue manual','Biomecánico','Sobreesfuerzo: lesiones lumbares','Máximo 25 kg por persona, ayudas mecánicas, pausas'],['Almacenamiento','Condiciones de seguridad','Caída de materiales apilados: golpes','Arrume estable y a máximo 1,5 m, pasillos despejados']],
+ 'Pintura de fachada':[['Preparación de superficie','Físico','Material particulado: afección respiratoria','Respirador con filtro, humectación de superficie'],['Aplicación desde andamio o silla','Condiciones de seguridad','Caída de distinto nivel','Permiso FT-SST-091, arnés y línea de vida, coordinador presente'],['Manejo de pinturas y solventes','Químico','Inhalación de vapores: intoxicación','Respirador para vapores orgánicos, FDS disponible, ventilación']]
+};
+const ATS_STEPS=['Datos de la tarea','Procedimientos','Verificación','Peligros y controles','Personal','Aprobación','Revisión'];
+const CODES={alturas:{code:'FT-SST-091',name:'Permiso de trabajo en alturas',title:'FORMATO PERMISO DE TRABAJO EN ALTURAS',dir:'PPCCA'},ats:{code:'FT-SST-094',name:'Análisis de seguridad en el trabajo (ATS)',title:'FORMATO DE ANÁLISIS DE SEGURIDAD EN EL TRABAJO',dir:'PPCCA'}};
+const USERS=[{cedula:'1000000001',pin:'1234',nombre:'Usuario de prueba',rol:'SST'}];
+const keyOf=(s,i)=>s+'_'+i;
+const txt=it=>typeof it==='string'?it:it.t;
+
+/* ---------- estado y guardado en el equipo ---------- */
+const LS='sgsst-jma-v1';
+let S=load()||seed();
+S.permits.forEach(p=>{p.tipo=p.tipo||'alturas'});
+S.seqs=S.seqs||{alturas:S.seq||1,ats:0};
+if(!PROD&&!S.permits.some(p=>p.tipo==='ats')) S.permits.push(seedAts());
+let ui={view:S.user?'home':'login',pid:null,step:0};
+let savedAt=null;
+function load(){try{const r=localStorage.getItem(LS);return r?JSON.parse(r):null}catch(e){return null}}
+function save(){try{localStorage.setItem(LS,JSON.stringify(S));savedAt=new Date();const el=document.getElementById('savedat');if(el)el.textContent=stamp()}catch(e){}}
+function stamp(){return savedAt?'Guardado en este equipo · '+savedAt.toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'}):'Se guarda solo mientras escribes'}
+function iso(d){const z=new Date(d.getTime()-d.getTimezoneOffset()*60000);return z.toISOString().slice(0,10)}
+function today(){return iso(new Date())}
+function addDays(s,n){const d=new Date(s+'T12:00');d.setDate(d.getDate()+n);return iso(d)}
+function uid(){return Math.random().toString(36).slice(2,9)}
+function blankAlt(n){return{id:'p'+Date.now(),tipo:'alturas',consecutivo:n,status:'borrador',creado:new Date().toISOString(),step:0,
+  gen:{fecha:today(),hora:new Date().toTimeString().slice(0,5),inicio:'',fin:'',empresa:'J.M.A',area:'',tipo:'',personas:'',desc:'',herr:'',altura:'',foto:''},
+  checks:{},access:[],firmas:{},trabajadores:[{nombre:'',cedula:'',ss:'',firma:''}],cierre:{}}}
+function blankAts(n){const t=today();return{id:'a'+Date.now(),tipo:'ats',consecutivo:n,status:'borrador',creado:new Date().toISOString(),step:0,
+  gen:{obra:'',especialidad:'',actividad:'',inicio:t,fin:addDays(t,6),hora:new Date().toTimeString().slice(0,5),supervisor:'',empresa:'J.M.A'},
+  procs:[],otro:'',checks:{},etapas:[],workers:[{id:uid(),nombre:'',cedula:'',cargo:''}],asis:{},firmas:{},cierre:{}}}
+function seed(){
+  if(PROD)return{user:null,seqs:{alturas:0,ats:0},permits:[]};
+  const p=blankAlt(1);p.id='ejemplo';p.ejemplo=true;p.step=2;
+  Object.assign(p.gen,{inicio:'07:30',fin:'16:30',area:'Torre 2 · fachada norte, piso 6',tipo:'rutinario',personas:'2',desc:'Instalación de ventanería en fachada desde andamio certificado. Anclaje a línea de vida vertical independiente.',herr:'Taladro percutor, nivel, pistola de silicona, eslingas de posicionamiento',altura:'16'});
+  ALT.entorno.items.forEach((_,i)=>p.checks[keyOf('entorno',i)]={v:i===5?'na':'si'});
+  return{user:null,seqs:{alturas:1,ats:0},permits:[p]};
+}
+function seedAts(){
+  S.seqs.ats=(S.seqs.ats||0)+1;
+  const a=blankAts(S.seqs.ats);a.id='ejemplo-ats';a.ejemplo=true;a.step=3;
+  Object.assign(a.gen,{obra:'Edificio Mirador · Torre 2',especialidad:'Civil',actividad:'Fundida de placa piso 7',supervisor:'Residente de obra'});
+  a.procs=['civil','alturas'];
+  ATS_GEN.forEach((_,i)=>a.checks[keyOf('g',i)]={v:'si'});
+  a.etapas=LIB['Fundida de concreto'].map(e=>({id:uid(),etapa:e[0],clase:e[1],riesgo:e[2],control:e[3]}));
+  return a;
+}
+const P=()=>S.permits.find(p=>p.id===ui.pid);
+/* firmas registradas por cédula: cada persona firma una vez y luego reutiliza su firma */
+function regGet(c){c=String(c||'').trim();return c?(S.firmasReg||{})[c]:null}
+function regSet(c,u){c=String(c||'').trim();if(!c||!u)return;S.firmasReg=S.firmasReg||{};S.firmasReg[c]=u}
+const C=()=>CODES[P().tipo];
+
+/* ---------- utilidades ---------- */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const num=n=>String(n).padStart(4,'0');
+function numOf(p){if(!PROD)return num(p.consecutivo);return p.numero?num(p.numero):(ui.__pdf?'{{NUMERO}}':'por asignar')}
+function toast(m){const t=$('#toast');t.textContent=m;t.hidden=false;clearTimeout(toast.h);toast.h=setTimeout(()=>t.hidden=true,2600)}
+function net(){const on=navigator.onLine;const n=$('#net');n.classList.toggle('off',!on);n.querySelector('span').textContent=on?'En línea':'Sin señal · guardando en el equipo'}
+addEventListener('online',net);addEventListener('offline',net);
+const keep=fn=>{const y=scrollY;fn&&fn();render();scrollTo(0,y)};
+const dayLabel=s=>{const d=new Date(s+'T12:00');return['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'][d.getDay()]+' '+d.getDate()};
+function weekDays(p){const out=[];let d=p.gen.inicio;for(let i=0;i<7&&d<=p.gen.fin;i++){out.push(d);d=addDays(d,1)}return out}
+
+/* ---------- render ---------- */
+function render(){
+  net();
+  $('#logo-top').innerHTML=logoImg(LOGO_H,'J.M.A Consultoría, Ingeniería & Gestión','Logo J.M.A');
+  $('#logout').hidden=!S.user;
+  $('#who').textContent=S.user?S.user.nombre+' · '+S.user.rol:'Permisos e inspecciones en obra';
+  const app=$('#app'),bar=$('#bar'),bi=$('#barin');bar.hidden=true;
+  const v=ui.view;
+  if(v==='login')app.innerHTML=vLogin();
+  else if(v==='home')app.innerHTML=vHome();
+  else if(v==='wizard'){app.innerHTML=P().tipo==='ats'?vAts():vAlt();bar.hidden=false;bi.innerHTML=barWizard()}
+  else if(v==='cierre'){app.innerHTML=vCierre();bar.hidden=false;bi.innerHTML=`<button class="btn" data-act="doc">Volver</button><button class="btn primary" data-act="close-permit" ${cierreOk()?'':'disabled'}>Cerrar permiso</button>`}
+  else if(v==='asis'){app.innerHTML=vAsis();bar.hidden=false;bi.innerHTML=`<button class="btn" data-act="doc">Ver registro</button><button class="btn primary" data-act="home">Listo</button>`}
+  else if(v==='cierre-ats'){app.innerHTML=vCierreAts();bar.hidden=false;bi.innerHTML=`<button class="btn" data-act="doc">Volver</button><button class="btn primary" data-act="close-ats" ${P().cierre.firma?'':'disabled'}>Cerrar ATS</button>`}
+  else if(v==='doc'){app.innerHTML=vDoc();bar.hidden=false;bi.innerHTML=`<button class="btn" data-act="home">Volver al inicio</button>`}
+  else if(typeof renderQ==='function')renderQ(v,app,bar,bi);
+  if(!ui.keepScroll)window.scrollTo(0,0);ui.keepScroll=false;
+}
+
+function vLogin(){
+  return `<div class="tints"><i class="a"></i><i class="b"></i></div><div class="login stack">
+    <div class="logo-big">${logoImg(LOGO_V,'J.M.A Consultoría, Ingeniería & Gestión','Logo J.M.A')}</div>
+    <div><div class="eyebrow">Sistema de Gestión de la Seguridad y Salud en el Trabajo</div><h1>Ingresa con tu cédula</h1></div>
+    <form class="card" id="loginf">
+      <label class="f">Número de cédula<input class="in" id="lc" inputmode="numeric" autocomplete="username" required></label>
+      <label class="f">PIN de 4 dígitos<input class="in" id="lp" type="password" inputmode="numeric" maxlength="4" autocomplete="current-password" required></label>
+      <p class="no-msg" id="lerr" hidden>La cédula o el PIN no coinciden. Revisa e intenta de nuevo.</p>
+      <button class="btn primary block" type="submit">Entrar</button>
+      ${PROD?((S.usuarios||[]).length?'<div class="demo-hint">¿No tienes usuario o PIN? Pídelo a SST.</div>':'<div class="demo-hint"><b>Este equipo aún no está conectado.</b> SST debe abrir el enlace de conexión una vez, con internet.</div><button type="button" class="btn block" data-act="conexion">Configurar conexión</button>'):'<div class="demo-hint"><b>Prototipo:</b> usa la cédula <span class="code">1000000001</span> y el PIN <span class="code">1234</span>. En la versión instalada, SST registra a cada persona con su rol.</div>'}
+    </form></div>`;
+}
+
+function vHome(){
+  const ps=[...S.permits].sort((a,b)=>b.creado.localeCompare(a.creado));
+  const lab={borrador:'Borrador',abierto:'Abierto',vigente:'Vigente',cerrado:'Cerrado'};
+  const sub=p=>p.tipo==='ats'?`N.° ${numOf(p)} · semana ${esc(p.gen.inicio)} a ${esc(p.gen.fin)}`:`N.° ${numOf(p)} · ${esc(p.gen.fecha)}${p.gen.altura?' · '+esc(p.gen.altura)+' m':''}`;
+  const name=p=>p.tipo==='ats'?(p.gen.actividad||'ATS sin actividad'):(p.gen.area||'Sin lugar definido');
+  const vig=ps.filter(p=>p.tipo==='ats'&&p.status==='vigente');
+  return `<div class="tints"><i class="a"></i><i class="b"></i></div>
+    <div class="stack" style="margin-bottom:24px">
+      <div><div class="eyebrow">Buen día</div><h1>¿Qué vas a diligenciar?</h1></div>
+      <div class="newgrid">
+        <button class="newcard" data-act="new" data-tipo="alturas"><span class="plus">+</span><span><b>Permiso de trabajo en alturas</b><span class="code">FT-SST-091 · Versión 001</span></span></button>
+        <button class="newcard ats" data-act="new" data-tipo="ats"><span class="plus">+</span><span><b>ATS semanal</b><span class="code">FT-SST-094 · Versión 001</span></span></button>
+      </div>
+      ${vig.map(a=>`<button class="btn primary block" data-act="asis" data-id="${a.id}">Firmar asistencia de hoy · ${esc(a.gen.actividad)}</button>`).join('')}
+      ${typeof homeV==='function'?homeV():''}
+      <div class="row" style="justify-content:space-between;background:var(--surface-2);border-radius:var(--radius-md);padding:12px 14px"><span style="font-size:14px">${regGet(S.user&&S.user.cedula)?'Tu firma está registrada':'Registra tu firma una vez y firma con un toque'}</span><button class="btn small" data-act="myfirma">${regGet(S.user&&S.user.cedula)?'Cambiar mi firma':'Registrar mi firma'}</button></div>
+      ${typeof homeQ==='function'?homeQ():''}
+      <div class="modules">
+        ${[['Inspección de EPP','FT-SST-061'],['Inspección de extintores','FT-SST-060'],['Espacios confinados','FT-SST-115'],['Trabajo en caliente','FT-SST-111']].map(m=>`<div class="mod"><b>${m[0]}</b><span class="code">${m[1]} · próximamente</span></div>`).join('')}
+      </div>
+    </div>
+    <div class="stack">
+      <h2>Registros en este equipo</h2>
+      <div class="plist">${ps.map(p=>`<button class="pitem" data-act="open" data-id="${p.id}">
+        <div class="main"><b>${esc(name(p))}</b><span class="sub">${sub(p)}</span></div>
+        <div class="tags"><span class="pill tipo ${p.tipo}">${p.tipo==='ats'?'ATS':'Alturas'}</span><span class="pill ${p.status}">${lab[p.status]}</span>${p.ejemplo?'<span class="pill ej">Ejemplo</span>':''}</div><span class="chev">›</span></button>`).join('')}</div>
+      <p class="note">Sin señal también funciona: todo queda guardado en este equipo. En la versión instalada, cuando vuelve el internet los datos pasan a la hoja de Google y el PDF se archiva en Drive, en <span class="code">SG-SST JMA / PPCCA / código del formato / año-mes</span>.</p>
+    </div>`;
+}
+
+/* --- piezas compartidas --- */
+function itemsBlock(list,prefix,condLabel){
+  const p=P();
+  return `<div class="items">${list.map((it,i)=>{const k=keyOf(prefix,i),c=p.checks[k]||{};return `
+    <div class="item ${c.v?'v-'+c.v:''}">
+      ${condLabel?`<span class="tag-cond">${condLabel}</span>`:''}
+      <p>${esc(txt(it))}${it.n?`<span class="new">Nuevo${it.n.trim()?it.n:''}</span>`:''}</p>
+      <div class="tri" role="group" aria-label="Respuesta">${['si','no','na'].map(v=>`<button type="button" data-act="check" data-k="${k}" data-v="${v}" aria-pressed="${c.v===v}">${v==='si'?'SÍ':v==='no'?'NO':'N/A'}</button>`).join('')}</div>
+      ${c.v==='no'?`<p class="no-msg">Con un NO no se puede iniciar la tarea. Corrige la condición o explica en observaciones.</p>`:''}
+      ${c.v==='no'||c.obs!==undefined?`<input class="in obs" id="obs-${k}" data-obs="${k}" placeholder="Observación" value="${esc(c.obs||'')}">`:`<button class="link" type="button" data-act="addobs" data-k="${k}" style="align-self:flex-start">+ Observación</button>`}
+    </div>`}).join('')}</div>`;
+}
+function sigField(role,label,decl){
+  const f=P().firmas[role]||{};
+  return `<div class="card">
+    <h3>${label}</h3>${decl?`<p class="decl">${decl}</p>`:''}
+    <div class="grid2"><label class="f"><span class="req">Nombre y apellidos</span><input class="in" id="fn-${role}" data-sig="${role}" data-field="nombre" value="${esc(f.nombre||'')}"></label>
+    <label class="f"><span class="req">Cédula</span><input class="in" id="fc-${role}" inputmode="numeric" data-sig="${role}" data-field="cedula" value="${esc(f.cedula||'')}"></label></div>
+    <button type="button" class="sigbox ${f.img?'has':''}" data-act="sign" data-role="${role}">${f.img?`<img src="${f.img}" alt="Firma de ${esc(f.nombre||label)}">`:regGet(f.cedula)?'Toca para firmar · tiene firma registrada':'Toca para firmar'}</button>
+  </div>`;
+}
+function stepHead(steps){
+  const p=P(),st=ui.step;
+  return `<div class="stephead">
+    <div class="row" style="justify-content:space-between"><span class="eyebrow">Paso ${st+1} de ${steps.length} · <span class="code">${C().code}</span></span><button class="link" data-act="home">Guardar y salir</button></div>
+    <div class="progress">${steps.map((_,i)=>`<i class="${i<st?'done':i===st?'cur':''}"></i>`).join('')}</div>
+    <h1>${steps[st]}</h1>
+    <span class="saved" id="savedat">${stamp()}</span>
+    ${p.ejemplo?'<span class="pill ej" style="align-self:flex-start">Registro de ejemplo</span>':''}
+  </div>`;
+}
+function issuesBlock(r,okMsg){
+  return r.length?`<div class="card"><h3>Falta resolver ${r.length} punto(s)</h3>${r.map(x=>`<button class="issue" data-act="goto" data-step="${x.step}"><b>●</b><span>${esc(x.m)} <u>Ir al paso</u></span></button>`).join('')}</div>`:`<div class="okbox">${okMsg}</div>`;
+}
+function tally(keys){const p=P(),c={si:0,no:0,na:0};keys.forEach(k=>{const v=(p.checks[k]||{}).v;if(v)c[v]++});
+  return `<div class="card"><h3>Resumen de la verificación</h3><div class="tally"><div><b style="color:var(--verde)">${c.si}</b>SÍ</div><div><b style="color:var(--rojo)">${c.no}</b>NO</div><div><b>${c.na}</b>N/A</div></div></div>`}
+
+/* --- permiso de alturas --- */
+function vAlt(){
+  const p=P(),st=ui.step,g=p.gen;let body='';
+  if(st===0)body=`<div class="card">
+      <div class="grid2">
+        <label class="f"><span class="req">Fecha del permiso</span><input class="in" type="date" id="g-fecha" data-gen="fecha" value="${esc(g.fecha)}"></label>
+        <label class="f">Hora de diligenciamiento<input class="in" type="time" id="g-hora" data-gen="hora" value="${esc(g.hora)}"></label>
+        <label class="f"><span class="req">Hora de inicio</span><input class="in" type="time" id="g-inicio" data-gen="inicio" value="${esc(g.inicio)}"></label>
+        <label class="f"><span class="req">Hora de terminación</span><input class="in" type="time" id="g-fin" data-gen="fin" value="${esc(g.fin)}"></label>
+      </div>
+      <label class="f"><span class="req">Empresa ejecutora</span><input class="in" id="g-empresa" data-gen="empresa" value="${esc(g.empresa)}"></label>
+      <label class="f"><span class="req">Obra, área o lugar</span><input class="in" id="g-area" data-gen="area" value="${esc(g.area)}" placeholder="Ej: Torre 2, fachada norte, piso 6"></label>
+      <div class="f"><span class="req">Tipo de trabajo</span><div class="seg">${['rutinario','ocasional'].map(v=>`<button type="button" data-act="gen-seg" data-v="${v}" aria-pressed="${g.tipo===v}">${v==='rutinario'?'Rutinario':'Ocasional'}</button>`).join('')}</div></div>
+      <div class="grid2">
+        <label class="f"><span class="req">N.° de personas ejecutoras</span><input class="in" type="number" min="1" inputmode="numeric" id="g-personas" data-gen="personas" value="${esc(g.personas)}"></label>
+        <label class="f"><span class="req">Altura aproximada (m)</span><input class="in" type="number" min="0" step="0.1" inputmode="decimal" id="g-altura" data-gen="altura" value="${esc(g.altura)}"></label>
+      </div>
+      ${g.altura&&+g.altura<2?`<p class="decl">Por debajo de 2 m no se considera trabajo en alturas según la Resolución 4272 de 2021. Confirma la medida.</p>`:''}
+      <label class="f"><span class="req">Descripción y procedimiento de la tarea</span><textarea class="in" id="g-desc" data-gen="desc">${esc(g.desc)}</textarea></label>
+      <label class="f">Herramientas y equipos a utilizar<textarea class="in" id="g-herr" data-gen="herr">${esc(g.herr)}</textarea></label>
+      <div class="f"><span>Foto del área de trabajo</span>
+        <div class="photo">${g.foto?`<img src="${g.foto}" alt="Foto del área">`:''}<label class="btn small" for="g-foto">${g.foto?'Cambiar foto':'Tomar o subir foto'}</label><input id="g-foto" type="file" accept="image/*" capture="environment" hidden></div></div>
+    </div>`;
+  else if(st>=1&&st<=3){const sec=['entorno','verif','epp'][st-1];body=`<div class="allsi"><button class="btn small" data-act="allsi" data-sec="${sec}">Marcar pendientes en SÍ</button></div>${itemsBlock(ALT[sec].items,sec)}`}
+  else if(st===4)body=`<div class="card"><h3>¿Qué sistema de acceso se usará?</h3><p class="muted" style="margin:0">Elige uno o varios. Solo verás las preguntas de lo que elijas.</p>
+      <div class="chips">${ACCESS.map(([k,l])=>`<button type="button" class="chip" data-act="access" data-v="${k}" aria-pressed="${p.access.includes(k)}">${l}</button>`).join('')}<button type="button" class="chip" data-act="access" data-v="ninguno" aria-pressed="${p.access.includes('ninguno')}">Ninguno</button></div></div>
+    ${p.access.filter(a=>a!=='ninguno').map(a=>`<div class="subhead"><h2>${ALT[a].t}</h2><button class="btn small" data-act="allsi" data-sec="${a}">Pendientes en SÍ</button></div>${itemsBlock(ALT[a].items,a)}`).join('')}`;
+  else if(st===5){const n=+g.personas||0,w=p.trabajadores;
+    body=`<div class="stack">
+      ${sigField('autoriza','Persona que autoriza (residente o contratista)')}
+      ${sigField('emergencias','Responsable de activar el plan de emergencias')}
+      ${sigField('coordinador','Coordinador de trabajo en alturas','He verificado en campo con los trabajadores la aplicación del permiso y los demás controles para minimizar los riesgos de esta tarea, y considero seguro proceder.')}
+      <div class="card"><h3>Trabajadores</h3><p class="decl">He verificado con el coordinador de trabajo en alturas la aplicación del permiso y los demás controles para minimizar los riesgos de esta tarea.</p>
+        ${w.map((t,i)=>`<div class="worker"><div class="whead"><b>Trabajador ${i+1}</b>${w.length>1?`<button class="link" data-act="delw" data-i="${i}">Quitar</button>`:''}</div>
+          <div class="grid2"><label class="f"><span class="req">Nombre y apellidos</span><input class="in" id="wn-${i}" data-w="${i}" data-field="nombre" value="${esc(t.nombre)}"></label>
+          <label class="f"><span class="req">Cédula</span><input class="in" id="wc-${i}" inputmode="numeric" data-w="${i}" data-field="cedula" value="${esc(t.cedula)}"></label></div>
+          <div class="f"><span class="req">Seguridad social verificada</span><div class="seg">${['si','no'].map(v=>`<button type="button" data-act="wss" data-i="${i}" data-v="${v}" aria-pressed="${t.ss===v}">${v==='si'?'SÍ':'NO'}</button>`).join('')}</div></div>
+          <button type="button" class="sigbox ${t.firma?'has':''}" data-act="sign" data-role="w${i}">${t.firma?`<img src="${t.firma}" alt="Firma trabajador ${i+1}">`:'Toca para firmar'}</button></div>`).join('')}
+        <button class="btn" data-act="addw">+ Añadir trabajador</button>
+        ${n&&n!==w.length?`<p class="no-msg">Indicaste ${n} persona(s) ejecutora(s) y hay ${w.length} trabajador(es) en la lista.</p>`:''}
+      </div></div>`}
+  else if(st===6){const keys=[];altSecs(p).forEach(s=>ALT[s].items.forEach((_,i)=>keys.push(keyOf(s,i))));
+    body=`<div class="stack">${tally(keys)}${issuesBlock(reviewAlt(),`Todo está completo. Al abrir el permiso queda vigente para la jornada de hoy (${esc(g.inicio)} a ${esc(g.fin)}). Al terminar, el coordinador debe cerrarlo.`)}</div>`}
+  return stepHead(ALT_STEPS)+body;
+}
+const altSecs=p=>['entorno','verif','epp',...p.access.filter(a=>a!=='ninguno')];
+function reviewAlt(){
+  const p=P(),g=p.gen,out=[];
+  const req={fecha:'la fecha',inicio:'la hora de inicio',fin:'la hora de terminación',empresa:'la empresa ejecutora',area:'el lugar',tipo:'el tipo de trabajo',personas:'el número de personas',altura:'la altura',desc:'la descripción de la tarea'};
+  const miss=Object.keys(req).filter(k=>!String(g[k]||'').trim());
+  if(miss.length)out.push({step:0,m:'Datos de la tarea: falta '+miss.map(k=>req[k]).join(', ')+'.'});
+  const stepOf={entorno:1,verif:2,epp:3,andamio:4,escalera:4,canasta:4};
+  altSecs(p).forEach(s=>{let empty=0,no=[];ALT[s].items.forEach((it,i)=>{const v=(p.checks[keyOf(s,i)]||{}).v;if(!v)empty++;if(v==='no')no.push(txt(it))});
+    if(empty)out.push({step:stepOf[s],m:`${ALT[s].t}: ${empty} pregunta(s) sin responder.`});
+    no.forEach(t=>out.push({step:stepOf[s],m:`Respondido NO: "${t}". No se puede iniciar hasta corregirlo.`}))});
+  if(!p.access.length)out.push({step:4,m:'Sistema de acceso: elige cuál se usará o marca Ninguno.'});
+  [['autoriza','la persona que autoriza'],['emergencias','el responsable del plan de emergencias'],['coordinador','el coordinador de trabajo en alturas']].forEach(([r,l])=>{const f=p.firmas[r]||{};if(!f.nombre||!f.cedula||!f.img)out.push({step:5,m:`Falta nombre, cédula o firma de ${l}.`})});
+  p.trabajadores.forEach((t,i)=>{if(!t.nombre||!t.cedula||!t.firma||!t.ss)out.push({step:5,m:`Trabajador ${i+1}: faltan datos, verificación de seguridad social o firma.`});else if(t.ss==='no')out.push({step:5,m:`Trabajador ${i+1} sin seguridad social verificada: no puede ejecutar la tarea.`})});
+  if(+g.personas&&+g.personas!==p.trabajadores.length)out.push({step:5,m:`El número de trabajadores (${p.trabajadores.length}) no coincide con las personas ejecutoras (${g.personas}).`});
+  return out;
+}
+function cierreOk(){const c=P().cierre;return CIERRE.every((_,i)=>c['c'+i])&&c.firma}
+function vCierre(){
+  const p=P(),c=p.cierre;
+  return `<div class="stephead"><span class="eyebrow">Permiso N.° ${numOf(p)} · <span class="code">FT-SST-091</span></span><h1>Cierre del permiso</h1><span class="muted">${esc(p.gen.area)}</span></div>
+  <div class="card"><h3>El coordinador de trabajo en alturas verificó personalmente que:</h3>
+    ${CIERRE.map((t,i)=>`<div class="item ${c['c'+i]?'v-'+c['c'+i]:''}"><p>${t}</p><div class="seg">${['si','no'].map(v=>`<button type="button" data-act="cierre" data-i="${i}" data-v="${v}" aria-pressed="${c['c'+i]===v}">${v==='si'?'SÍ':'NO'}</button>`).join('')}</div>${i===2&&c.c2==='no'?'<p class="no-msg">Reporta el evento en el formato FT-SST-048 Reporte de incidentes y accidentes.</p>':''}</div>`).join('')}
+    <label class="f">Observaciones del cierre<textarea class="in" id="cierre-obs" data-cierre="obs">${esc(c.obs||'')}</textarea></label>
+    <div class="quick"><button type="button" data-act="obs-ok">${OBS_OK}</button></div>
+    <button type="button" class="sigbox ${c.firma?'has':''}" data-act="sign" data-role="cierre">${c.firma?`<img src="${c.firma}" alt="Firma de cierre">`:'Firma del coordinador'}</button>
+    <p class="muted" style="margin:0;font-size:14px">Coordinador: ${esc((p.firmas.coordinador||{}).nombre||'—')} · La fecha y hora de cierre se registran al cerrar.</p>
+  </div>`;
+}
+
+/* --- ATS --- */
+function atsCondKeys(p){const out=[];p.procs.forEach(pr=>{if(ATS_COND[pr])ATS_COND[pr][1].forEach((_,i)=>out.push(keyOf('c'+pr,i)))});return out}
+function vAts(){
+  const p=P(),st=ui.step,g=p.gen;let body='';
+  if(st===0)body=`<div class="card">
+      <label class="f"><span class="req">Obra o proyecto</span><input class="in" id="a-obra" data-gen="obra" value="${esc(g.obra)}" placeholder="Ej: Edificio Mirador, Torre 2"></label>
+      <div class="grid2">
+        <label class="f"><span class="req">Especialidad</span><input class="in" id="a-esp" data-gen="especialidad" value="${esc(g.especialidad)}" placeholder="Civil, eléctrica, hidráulica…"></label>
+        <label class="f">Empresa<input class="in" id="a-emp" data-gen="empresa" value="${esc(g.empresa)}"></label>
+      </div>
+      <label class="f"><span class="req">Trabajo o actividad a realizar</span><textarea class="in" id="a-act" data-gen="actividad">${esc(g.actividad)}</textarea></label>
+      <div class="grid2">
+        <label class="f"><span class="req">Inicio de la semana</span><input class="in" type="date" id="a-ini" data-gen="inicio" value="${esc(g.inicio)}"></label>
+        <label class="f"><span class="req">Fin de la semana</span><input class="in" type="date" id="a-fin" data-gen="fin" value="${esc(g.fin)}"></label>
+        <label class="f">Hora de inicio<input class="in" type="time" id="a-hora" data-gen="hora" value="${esc(g.hora)}"></label>
+        <label class="f"><span class="req">Supervisor responsable</span><input class="in" id="a-sup" data-gen="supervisor" value="${esc(g.supervisor)}"></label>
+      </div>
+      <p class="decl">El ATS es válido para una semana y una misma actividad. Si cambia la tarea o aparecen peligros nuevos, se hace un ATS nuevo.</p>
+    </div>`;
+  else if(st===1)body=`<div class="card"><h3>¿Qué procedimientos incluye la actividad?</h3><p class="muted" style="margin:0">Según lo que elijas, el paso siguiente agrega las preguntas de verificación que aplican.</p>
+      <div class="chips">${PROCS.map(([k,l])=>`<button type="button" class="chip" data-act="proc" data-v="${k}" aria-pressed="${p.procs.includes(k)}">${l}</button>`).join('')}</div>
+      ${p.procs.includes('otro')?`<label class="f"><span class="req">¿Cuál otro procedimiento?</span><input class="in" id="a-otro" data-root="otro" value="${esc(p.otro)}"></label>`:''}</div>`;
+  else if(st===2){body=`<div class="allsi"><button class="btn small" data-act="allsi-ats">Marcar pendientes en SÍ</button></div><h2>Condiciones generales</h2>${itemsBlock(ATS_GEN,'g')}`;
+    p.procs.forEach(pr=>{if(ATS_COND[pr])body+=`<div class="subhead"><h2>${ATS_COND[pr][0]}</h2></div>${itemsBlock(ATS_COND[pr][1],'c'+pr,'Por '+ATS_COND[pr][0].toLowerCase())}`});}
+  else if(st===3)body=`<div class="stack">
+      <div class="lib"><h3>Agregar desde la lista rápida</h3><p class="muted" style="margin:0;font-size:14px">Funciona sin señal. Agrega las etapas típicas de la actividad; luego ajústalas a la obra.</p>
+        <select class="in" id="libsel"><option value="">Elige una actividad…</option>${Object.keys(LIB).map(k=>`<option>${k}</option>`).join('')}</select>
+        <button class="btn primary" data-act="addlib">Agregar etapas</button></div>
+      ${p.etapas.map((e,i)=>`<div class="etapa"><div class="eh"><span class="num">${i+1}</span><button class="link" data-act="dele" data-i="${i}">Quitar etapa</button></div>
+        <label class="f"><span class="req">Etapa del trabajo</span><input class="in" id="e-et-${e.id}" data-e="${i}" data-field="etapa" value="${esc(e.etapa)}"></label>
+        <label class="f"><span class="req">Clasificación del peligro (GTC 45)</span><select class="in" id="e-cl-${e.id}" data-e="${i}" data-field="clase"><option value="">Elige…</option>${GTC.map(c=>`<option ${e.clase===c?'selected':''}>${c}</option>`).join('')}</select></label>
+        <label class="f"><span class="req">Peligro y riesgo (consecuencia)</span><textarea class="in" id="e-ri-${e.id}" data-e="${i}" data-field="riesgo">${esc(e.riesgo)}</textarea></label>
+        <label class="f"><span class="req">Controles y recomendaciones</span><textarea class="in" id="e-co-${e.id}" data-e="${i}" data-field="control">${esc(e.control)}</textarea></label></div>`).join('')}
+      <button class="btn" data-act="adde">+ Agregar etapa en blanco</button></div>`;
+  else if(st===4){const days=weekDays(p),t=today();
+    body=`<div class="card"><h3>Cuadrilla</h3><p class="decl">Cada trabajador firma la asistencia el día que participa. Hoy firman los que inician; los demás días se firma desde el inicio, en "Firmar asistencia de hoy".</p>
+      ${p.workers.map((w,i)=>`<div class="worker"><div class="whead"><b>Trabajador ${i+1}</b>${p.workers.length>1?`<button class="link" data-act="delaw" data-i="${i}">Quitar</button>`:''}</div>
+        <div class="grid2"><label class="f"><span class="req">Nombre y apellidos</span><input class="in" id="aw-n-${w.id}" data-aw="${i}" data-field="nombre" value="${esc(w.nombre)}"></label>
+        <label class="f"><span class="req">Cédula</span><input class="in" id="aw-c-${w.id}" inputmode="numeric" data-aw="${i}" data-field="cedula" value="${esc(w.cedula)}"></label></div>
+        <label class="f">Cargo<input class="in" id="aw-g-${w.id}" data-aw="${i}" data-field="cargo" value="${esc(w.cargo)}" placeholder="Oficial, ayudante, maestro…"></label>
+        ${daysRow(p,w,days,t)}</div>`).join('')}
+      <button class="btn" data-act="addaw">+ Añadir trabajador</button></div>`}
+  else if(st===5)body=`<div class="stack">${sigField('elabora','Quien elabora (ejecutor principal)','Elaboré este análisis con la cuadrilla y socialicé los peligros y controles antes de iniciar.')}${sigField('aprueba','Quien aprueba (supervisor o SST)','Revisé el análisis y apruebo la ejecución de la actividad con los controles definidos.')}</div>`;
+  else if(st===6){const keys=ATS_GEN.map((_,i)=>keyOf('g',i)).concat(atsCondKeys(p));
+    body=`<div class="stack">${tally(keys)}${issuesBlock(reviewAts(),`Todo está completo. Al aprobar, el ATS queda vigente del ${esc(g.inicio)} al ${esc(g.fin)} y cada día la cuadrilla firma su asistencia.`)}</div>`}
+  return stepHead(ATS_STEPS)+body;
+}
+function daysRow(p,w,days,t){
+  return `<div class="f"><span>Asistencia de la semana</span><div class="days">${days.map(d=>{const has=(p.asis[w.id]||{})[d];return `<button type="button" class="day ${has?'done':''} ${d===t?'today':''}" data-act="sign" data-role="asis:${w.id}:${d}" ${d>t?'disabled':''} aria-label="Firmar ${dayLabel(d)}">${dayLabel(d).split(' ')[0]}<span>${has?'✓':dayLabel(d).split(' ')[1]}</span></button>`}).join('')}</div></div>`;
+}
+function reviewAts(){
+  const p=P(),g=p.gen,out=[];
+  const req={obra:'la obra',especialidad:'la especialidad',actividad:'la actividad',inicio:'el inicio de semana',fin:'el fin de semana',supervisor:'el supervisor'};
+  const miss=Object.keys(req).filter(k=>!String(g[k]||'').trim());
+  if(miss.length)out.push({step:0,m:'Datos de la tarea: falta '+miss.map(k=>req[k]).join(', ')+'.'});
+  if(g.fin<g.inicio)out.push({step:0,m:'El fin de la semana es anterior al inicio.'});
+  if(!p.procs.length)out.push({step:1,m:'Elige al menos un procedimiento.'});
+  if(p.procs.includes('otro')&&!p.otro.trim())out.push({step:1,m:'Escribe cuál es el otro procedimiento.'});
+  const all=[...ATS_GEN.map((t,i)=>[keyOf('g',i),t])];p.procs.forEach(pr=>{if(ATS_COND[pr])ATS_COND[pr][1].forEach((t,i)=>all.push([keyOf('c'+pr,i),txt(t)]))});
+  const empty=all.filter(([k])=>!(p.checks[k]||{}).v).length;
+  if(empty)out.push({step:2,m:`Verificación: ${empty} pregunta(s) sin responder.`});
+  all.filter(([k])=>(p.checks[k]||{}).v==='no').forEach(([,t])=>out.push({step:2,m:`Respondido NO: "${t}". No se puede iniciar hasta corregirlo.`}));
+  if(!p.etapas.length)out.push({step:3,m:'Agrega al menos una etapa con sus peligros y controles.'});
+  p.etapas.forEach((e,i)=>{if(!e.etapa||!e.clase||!e.riesgo||!e.control)out.push({step:3,m:`Etapa ${i+1}: completa etapa, clasificación, riesgo y controles.`})});
+  p.workers.forEach((w,i)=>{if(!w.nombre||!w.cedula)out.push({step:4,m:`Trabajador ${i+1}: falta nombre o cédula.`})});
+  if(!p.workers.some(w=>Object.keys(p.asis[w.id]||{}).length))out.push({step:4,m:'Al menos un trabajador debe firmar la asistencia del primer día.'});
+  [['elabora','quien elabora'],['aprueba','quien aprueba']].forEach(([r,l])=>{const f=p.firmas[r]||{};if(!f.nombre||!f.cedula||!f.img)out.push({step:5,m:`Falta nombre, cédula o firma de ${l}.`})});
+  return out;
+}
+function vAsis(){
+  const p=P(),days=weekDays(p),t=today(),inWeek=days.includes(t);
+  return `<div class="stephead"><span class="eyebrow">ATS N.° ${numOf(p)} · <span class="code">FT-SST-094</span></span><h1>Asistencia de hoy</h1><span class="muted">${esc(p.gen.actividad)} · ${esc(p.gen.obra)}</span></div>
+    ${inWeek?'':`<p class="no-msg" style="margin-bottom:16px">Hoy está fuera de la semana de este ATS (${esc(p.gen.inicio)} a ${esc(p.gen.fin)}). Haz un ATS nuevo.</p>`}
+    <div class="card"><p class="decl">Antes de firmar, el ejecutor socializa con la cuadrilla los peligros y controles del ATS.</p>
+      ${p.workers.map((w,i)=>`<div class="worker"><div class="whead"><b>${esc(w.nombre||'Trabajador '+(i+1))}</b><span class="muted" style="font-size:14px">${esc(w.cargo)}</span></div>${w.nombre?'':`<div class="grid2"><label class="f"><span class="req">Nombre y apellidos</span><input class="in" id="aw-n-${w.id}" data-aw="${i}" data-field="nombre" value=""></label><label class="f"><span class="req">Cédula</span><input class="in" id="aw-c-${w.id}" inputmode="numeric" data-aw="${i}" data-field="cedula" value="${esc(w.cedula)}"></label></div>`}${daysRow(p,w,days,t)}</div>`).join('')}
+      <button class="btn" data-act="addaw">+ Trabajador que se une hoy</button>
+      <button class="link" data-act="to-cierre-ats" style="align-self:flex-start">Terminó la actividad: cerrar el ATS</button>
+    </div>`;
+}
+function vCierreAts(){
+  const p=P(),c=p.cierre;
+  return `<div class="stephead"><span class="eyebrow">ATS N.° ${numOf(p)} · <span class="code">FT-SST-094</span></span><h1>Cierre del ATS</h1><span class="muted">${esc(p.gen.actividad)}</span></div>
+    <div class="card"><div class="f"><span>¿Se presentaron incidentes o accidentes?</span><div class="seg">${['no','si'].map(v=>`<button type="button" data-act="ats-inc" data-v="${v}" aria-pressed="${c.inc===v}">${v==='si'?'SÍ':'NO'}</button>`).join('')}</div></div>
+      ${c.inc==='si'?'<p class="no-msg">Reporta el evento en el formato FT-SST-048 Reporte de incidentes y accidentes.</p>':''}
+      <label class="f">Observaciones del cierre<textarea class="in" id="cierre-obs" data-cierre="obs">${esc(c.obs||'')}</textarea></label>
+      <div class="quick"><button type="button" data-act="obs-ok">${OBS_OK}</button></div>
+      <button type="button" class="sigbox ${c.firma?'has':''}" data-act="sign" data-role="cierre">${c.firma?`<img src="${c.firma}" alt="Firma de cierre">`:'Firma de quien aprueba'}</button></div>`;
+}
+
+/* --- registro / PDF --- */
+function docHeader(p){const c=CODES[p.tipo];
+  return `<table class="hdr"><tr><td rowspan="3" style="width:24%">${LOGO_H?`<img src="${LOGO_H}" alt="J.M.A">`:'<small>Logo J.M.A</small>'}</td><td rowspan="3"><div style="font-size:10px">Sistema de Gestión de la Seguridad y Salud en el Trabajo</div><div class="ttl">${c.title}</div></td><td style="width:24%">Código: <b>${c.code}</b></td></tr><tr><td>Versión: 001</td></tr><tr><td>N.° ${numOf(p)}</td></tr></table>`}
+function checksTable(title,list,prefix,p){return `<table class="sec"><tr><th>${title}</th><th class="c">SÍ</th><th class="c">NO</th><th class="c">N/A</th><th>Observaciones</th></tr>${list.map((it,i)=>{const c=p.checks[keyOf(prefix,i)]||{};return `<tr><td>${esc(txt(it))}</td><td class="c">${c.v==='si'?'X':''}</td><td class="c no">${c.v==='no'?'X':''}</td><td class="c">${c.v==='na'?'X':''}</td><td>${esc(c.obs||'')}</td></tr>`}).join('')}</table>`}
+const sgCell=(p,r,l)=>{const x=p.firmas[r]||{};return `<td><b>${l}</b><br>${esc(x.nombre||'')} · C.C. ${esc(x.cedula||'')}<br>${x.img?`<img src="${x.img}" alt="">`:''}</td>`};
+function vDoc(){
+  const p=P(),c=CODES[p.tipo];let inner='',actions='';
+  if(p.tipo==='alturas'){const g=p.gen;let n=5;const acc=p.access.filter(a=>a!=='ninguno');
+    inner=`<table class="sec"><tr><th colspan="4">1. Generalidades</th></tr>
+      <tr><td><b>Fecha</b> ${esc(g.fecha)}</td><td><b>Diligenciado</b> ${esc(g.hora)}</td><td><b>Inicio</b> ${esc(g.inicio)}</td><td><b>Fin</b> ${esc(g.fin)}</td></tr>
+      <tr><td colspan="2"><b>Empresa</b> ${esc(g.empresa)}</td><td colspan="2"><b>Lugar</b> ${esc(g.area)}</td></tr>
+      <tr><td><b>Tipo</b> ${esc(g.tipo)}</td><td><b>Personas</b> ${esc(g.personas)}</td><td colspan="2"><b>Altura</b> ${esc(g.altura)} m</td></tr>
+      <tr><td colspan="4"><b>Descripción</b> ${esc(g.desc)}</td></tr><tr><td colspan="4"><b>Herramientas</b> ${esc(g.herr)}</td></tr></table>
+      ${checksTable('2. '+ALT.entorno.t,ALT.entorno.items,'entorno',p)}${checksTable('3. '+ALT.verif.t,ALT.verif.items,'verif',p)}${checksTable('4. '+ALT.epp.t,ALT.epp.items,'epp',p)}
+      ${acc.length?acc.map(a=>checksTable((n++)+'. '+ALT[a].t,ALT[a].items,a,p)).join(''):'<table class="sec"><tr><th>5. Sistema de acceso</th></tr><tr><td>No se usa andamio, escalera ni canasta.</td></tr></table>'}
+      <table class="sec"><tr><th colspan="2">Firmas del permiso</th></tr><tr>${sgCell(p,'autoriza','Autoriza')}${sgCell(p,'emergencias','Responsable plan de emergencias')}</tr><tr>${sgCell(p,'coordinador','Coordinador de trabajo en alturas')}<td></td></tr></table>
+      <table class="sec"><tr><th>Trabajador</th><th>Cédula</th><th>Seg. social</th><th>Firma</th></tr>${p.trabajadores.map(t=>`<tr><td>${esc(t.nombre)}</td><td>${esc(t.cedula)}</td><td>${t.ss==='si'?'SÍ':'NO'}</td><td>${t.firma?`<img src="${t.firma}" alt="">`:''}</td></tr>`).join('')}</table>
+      ${p.status==='cerrado'?`<table class="sec"><tr><th colspan="2">Cierre del permiso · ${esc(p.cierre.fecha)}</th></tr>${CIERRE.map((t,i)=>`<tr><td>${t}</td><td class="c">${p.cierre['c'+i]==='si'?'SÍ':'NO'}</td></tr>`).join('')}<tr><td colspan="2"><b>Observaciones</b> ${esc(p.cierre.obs||'')}</td></tr><tr><td colspan="2"><b>Coordinador</b> ${esc((p.firmas.coordinador||{}).nombre||'')} <img src="${p.cierre.firma}" alt=""></td></tr></table>`:''}`;
+    if(p.status==='abierto')actions=`<button class="btn primary block" data-act="to-cierre">Cerrar el permiso al terminar la tarea</button>`;
+  }else{const g=p.gen,days=weekDays(p);
+    const procs=p.procs.map(k=>k==='otro'?'Otro: '+p.otro:PROCS.find(x=>x[0]===k)[1]).join(' · ');
+    inner=`<table class="sec"><tr><th colspan="4">1. Datos generales de la tarea</th></tr>
+      <tr><td colspan="2"><b>Obra / proyecto</b> ${esc(g.obra)}</td><td colspan="2"><b>Especialidad</b> ${esc(g.especialidad)}</td></tr>
+      <tr><td colspan="4"><b>Actividad</b> ${esc(g.actividad)}</td></tr>
+      <tr><td><b>Semana</b> ${esc(g.inicio)} a ${esc(g.fin)}</td><td><b>Hora</b> ${esc(g.hora)}</td><td colspan="2"><b>Supervisor</b> ${esc(g.supervisor)}</td></tr>
+      <tr><td colspan="4"><b>Procedimientos</b> ${esc(procs)}</td></tr></table>
+      ${checksTable('2. Verificación de condiciones',ATS_GEN,'g',p)}
+      ${p.procs.filter(k=>ATS_COND[k]).map(k=>checksTable('Verificación · '+ATS_COND[k][0],ATS_COND[k][1],'c'+k,p)).join('')}
+      <table class="sec"><tr><th>#</th><th>Etapa</th><th>Clase GTC 45</th><th>Peligro y riesgo</th><th>Controles</th></tr>${p.etapas.map((e,i)=>`<tr><td>${i+1}</td><td>${esc(e.etapa)}</td><td>${esc(e.clase)}</td><td>${esc(e.riesgo)}</td><td>${esc(e.control)}</td></tr>`).join('')}</table>
+      <table class="sec"><tr><th>Trabajador</th><th>Cédula</th><th>Cargo</th>${days.map(d=>`<th class="c">${dayLabel(d)}</th>`).join('')}</tr>${p.workers.map(w=>`<tr><td>${esc(w.nombre)}</td><td>${esc(w.cedula)}</td><td>${esc(w.cargo)}</td>${days.map(d=>{const s=(p.asis[w.id]||{})[d];return `<td class="dsig">${s?`<img src="${s}" alt="">`:''}</td>`}).join('')}</tr>`).join('')}</table>
+      <table class="sec"><tr><th colspan="2">Aprobación y firmas</th></tr><tr>${sgCell(p,'elabora','Elabora (ejecutor principal)')}${sgCell(p,'aprueba','Aprueba (supervisor / SST)')}</tr></table>
+      ${p.status==='cerrado'?`<table class="sec"><tr><th>Cierre del ATS · ${esc(p.cierre.fecha)}</th></tr><tr><td><b>Incidentes o accidentes:</b> ${p.cierre.inc==='si'?'SÍ':'NO'}</td></tr><tr><td><b>Observaciones</b> ${esc(p.cierre.obs||'')}</td></tr><tr><td><img src="${p.cierre.firma}" alt=""></td></tr></table>`:''}`;
+    if(p.status==='vigente')actions=`<button class="btn primary block" data-act="asis" data-id="${p.id}">Firmar asistencia de hoy</button><button class="btn block" data-act="to-cierre-ats">Cerrar el ATS</button>`;
+  }
+  const st={abierto:'Permiso abierto · vigente hoy',vigente:'ATS vigente esta semana',cerrado:p.tipo==='ats'?'ATS cerrado':'Permiso cerrado'}[p.status];
+  return `<div class="stack">
+    <div class="stephead"><span class="eyebrow">${st}</span><h1>Registro ${c.code}</h1></div>
+    <p class="note">Así queda el PDF que se archiva en <span class="code">SG-SST JMA / ${c.dir} / ${c.code}</span>. En el prototipo se muestra aquí; en la versión instalada se genera y se guarda en Drive automáticamente.</p>
+    ${actions}
+    <div class="docwrap"><div class="doc">${docHeader(p)}${inner}</div></div></div>`;
+}
+
+function barWizard(){
+  const p=P(),st=ui.step,steps=p.tipo==='ats'?ATS_STEPS:ALT_STEPS;
+  const back=st===0?`<button class="btn" data-act="home">Inicio</button>`:`<button class="btn" data-act="prev">Atrás</button>`;
+  const issues=p.tipo==='ats'?reviewAts():reviewAlt();
+  const next=st<steps.length-1?`<button class="btn primary" data-act="next">Siguiente</button>`:`<button class="btn primary" data-act="finish" ${issues.length?'disabled':''}>${p.tipo==='ats'?'Aprobar ATS':'Abrir permiso'}</button>`;
+  return back+next;
+}
+
+/* ---------- firma a pantalla completa ---------- */
+function openSign(role){
+  const p=P();let label,setter;
+  if(role.startsWith('asis:')){const[,wid,d]=role.split(':');const w=p.workers.find(x=>x.id===wid);
+    if(!w.nombre){toast('Escribe primero el nombre del trabajador');return}
+    label=`${w.nombre} · ${dayLabel(d)}`;setter=u=>{p.asis[wid]=p.asis[wid]||{};p.asis[wid][d]=u}}
+  else if(role==='cierre'){label='Firma de cierre';setter=u=>p.cierre.firma=u}
+  else if(role[0]==='w'&&/^w\d+$/.test(role)){label='Trabajador '+(+role.slice(1)+1);setter=u=>p.trabajadores[+role.slice(1)].firma=u}
+  else{label={autoriza:'Persona que autoriza',emergencias:'Responsable plan de emergencias',coordinador:'Coordinador de trabajo en alturas',elabora:'Quien elabora',aprueba:'Quien aprueba'}[role];setter=u=>{p.firmas[role]=p.firmas[role]||{};p.firmas[role].img=u}}
+  let ced='';
+  if(role.startsWith('asis:'))ced=(p.workers.find(x=>x.id===role.split(':')[1])||{}).cedula;
+  else if(role==='cierre')ced=(p.firmas[p.tipo==='ats'?'aprueba':'coordinador']||{}).cedula;
+  else if(/^w\d+$/.test(role))ced=p.trabajadores[+role.slice(1)].cedula;
+  else ced=(p.firmas[role]||{}).cedula;
+  signModal(label,ced,setter);
+}
+function signModal(label,ced,setter){
+  const reg=regGet(ced);
+  const m=document.createElement('div');m.className='modal';
+  m.innerHTML=`<div class="row" style="justify-content:space-between"><div><div class="eyebrow">Firma${ced?' · C.C. '+esc(ced):''}</div><h1 style="font-size:20px;line-height:28px">${esc(label)}</h1></div><span class="muted" style="font-size:13px">Gira el equipo para tener más espacio</span></div>${reg?`<div class="card" style="gap:8px;padding:12px"><span class="eyebrow">Firma registrada</span><img src="${reg}" alt="Firma registrada" style="max-height:80px;align-self:flex-start"><button class="btn primary" id="sreg">Firmar con mi firma registrada</button><span class="muted" style="font-size:13px">O dibuja una nueva abajo; la nueva queda como registrada.</span></div>`:''}<canvas aria-label="Área de firma"></canvas>${ced?'':'<p class="muted" style="margin:0;font-size:13px">Escribe la cédula antes de firmar para que la firma quede registrada.</p>'}<div class="row"><button class="btn" id="sx">Cancelar</button><button class="btn" id="sc">Borrar</button><button class="btn primary" id="sok">Guardar firma</button></div>`;
+  document.body.appendChild(m);
+  const cv=m.querySelector('canvas'),ctx=cv.getContext('2d');let drawing=false,has=false,last=null;
+  function size(){const r=cv.getBoundingClientRect(),d=devicePixelRatio||1;cv.width=r.width*d;cv.height=r.height*d;ctx.setTransform(d,0,0,d,0,0);ctx.lineWidth=2.6;ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#134680';ctx.fillStyle='#134680';has=false}
+  size();const ro=new ResizeObserver(size);ro.observe(cv);
+  const pt=e=>{const r=cv.getBoundingClientRect();return[e.clientX-r.left,e.clientY-r.top]};
+  cv.addEventListener('pointerdown',e=>{drawing=true;last=pt(e);cv.setPointerCapture(e.pointerId);ctx.beginPath();ctx.arc(last[0],last[1],1.2,0,7);ctx.fill();has=true});
+  cv.addEventListener('pointermove',e=>{if(!drawing)return;const q=pt(e);ctx.beginPath();ctx.moveTo(last[0],last[1]);ctx.lineTo(q[0],q[1]);ctx.stroke();last=q;has=true});
+  ['pointerup','pointercancel'].forEach(t=>cv.addEventListener(t,()=>drawing=false));
+  const close=()=>{ro.disconnect();m.remove()};
+  m.querySelector('#sx').onclick=close;
+  m.querySelector('#sc').onclick=()=>{ctx.clearRect(0,0,cv.width,cv.height);has=false};
+  m.querySelector('#sok').onclick=()=>{if(!has){toast('Dibuja la firma antes de guardar');return}const u=cv.toDataURL('image/png');setter(u);regSet(ced,u);save();close();keep();toast(ced?'Firma guardada y registrada':'Firma guardada')};
+  if(reg)m.querySelector('#sreg').onclick=()=>{setter(reg);save();close();keep();toast('Firmado con la firma registrada')};
+}
+
+/* ---------- eventos ---------- */
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-act]');if(!b)return;const a=b.dataset.act,p=P();
+  if(a==='new'){const t=b.dataset.tipo;S.seqs[t]=(S.seqs[t]||0)+1;const np=t==='ats'?blankAts(S.seqs[t]):blankAlt(S.seqs[t]);S.permits.push(np);ui={view:'wizard',pid:np.id,step:0};save();render()}
+  else if(a==='open'){ui.pid=b.dataset.id;const q=P();if(q.status==='borrador'){ui.view='wizard';ui.step=q.step||0}else ui.view='doc';render()}
+  else if(a==='home'){ui.view='home';render()}
+  else if(a==='doc'){ui.view='doc';render()}
+  else if(a==='asis'){ui.pid=b.dataset.id||ui.pid;ui.view='asis';render()}
+  else if(a==='next'){ui.step++;p.step=ui.step;save();render()}
+  else if(a==='prev'){ui.step--;p.step=ui.step;save();render()}
+  else if(a==='goto'){ui.step=+b.dataset.step;p.step=ui.step;render()}
+  else if(a==='check')keep(()=>{const k=b.dataset.k;p.checks[k]=p.checks[k]||{};p.checks[k].v=b.dataset.v;save()});
+  else if(a==='addobs'){const k=b.dataset.k;keep(()=>{p.checks[k]=p.checks[k]||{};p.checks[k].obs=''});const i=document.getElementById('obs-'+k);if(i)i.focus()}
+  else if(a==='allsi')keep(()=>{const s=b.dataset.sec;ALT[s].items.forEach((_,i)=>{const k=keyOf(s,i);p.checks[k]=p.checks[k]||{};if(!p.checks[k].v)p.checks[k].v='si'});save();toast('Las pendientes quedaron en SÍ. Revisa cada una.')});
+  else if(a==='allsi-ats')keep(()=>{const keys=ATS_GEN.map((_,i)=>keyOf('g',i)).concat(atsCondKeys(p));keys.forEach(k=>{p.checks[k]=p.checks[k]||{};if(!p.checks[k].v)p.checks[k].v='si'});save();toast('Las pendientes quedaron en SÍ. Revisa cada una.')});
+  else if(a==='gen-seg')keep(()=>{p.gen.tipo=b.dataset.v;save()});
+  else if(a==='access')keep(()=>{const v=b.dataset.v;if(v==='ninguno')p.access=p.access.includes('ninguno')?[]:['ninguno'];else{p.access=p.access.filter(x=>x!=='ninguno');p.access=p.access.includes(v)?p.access.filter(x=>x!==v):[...p.access,v]}save()});
+  else if(a==='proc')keep(()=>{const v=b.dataset.v;p.procs=p.procs.includes(v)?p.procs.filter(x=>x!==v):[...p.procs,v];save()});
+  else if(a==='sign')openSign(b.dataset.role);
+  else if(a==='conexion'){ui.view='conexion';render()}
+  else if(a==='myfirma')signModal('Mi firma · '+S.user.nombre,S.user.cedula,()=>{});
+  else if(a==='addw')keep(()=>{p.trabajadores.push({nombre:'',cedula:'',ss:'',firma:''});save()});
+  else if(a==='delw')keep(()=>{p.trabajadores.splice(+b.dataset.i,1);save()});
+  else if(a==='wss')keep(()=>{p.trabajadores[+b.dataset.i].ss=b.dataset.v;save()});
+  else if(a==='addaw')keep(()=>{p.workers.push({id:uid(),nombre:'',cedula:'',cargo:''});save()});
+  else if(a==='delaw')keep(()=>{const w=p.workers.splice(+b.dataset.i,1)[0];delete p.asis[w.id];save()});
+  else if(a==='addlib'){const k=$('#libsel').value;if(!k){toast('Elige una actividad de la lista');return}keep(()=>{LIB[k].forEach(x=>p.etapas.push({id:uid(),etapa:x[0],clase:x[1],riesgo:x[2],control:x[3]}));save()});toast(LIB[k].length+' etapas agregadas. Ajústalas a la obra.')}
+  else if(a==='adde')keep(()=>{p.etapas.push({id:uid(),etapa:'',clase:'',riesgo:'',control:''});save()});
+  else if(a==='dele')keep(()=>{p.etapas.splice(+b.dataset.i,1);save()});
+  else if(a==='finish'){
+    if(p.tipo==='ats'){if(reviewAts().length)return;p.status='vigente';save();ui.view='doc';render();toast('ATS aprobado y vigente esta semana')}
+    else{if(reviewAlt().length)return;p.status='abierto';p.abierto=new Date().toISOString();save();ui.view='doc';render();toast('Permiso abierto y guardado')}}
+  else if(a==='to-cierre'){ui.view='cierre';render()}
+  else if(a==='to-cierre-ats'){ui.view='cierre-ats';render()}
+  else if(a==='cierre')keep(()=>{p.cierre['c'+b.dataset.i]=b.dataset.v;if(CIERRE.every((_,i)=>p.cierre['c'+i]==='si')&&!p.cierre.obs)p.cierre.obs=OBS_OK;save()});
+  else if(a==='ats-inc')keep(()=>{p.cierre.inc=b.dataset.v;if(b.dataset.v==='no'&&!p.cierre.obs)p.cierre.obs=OBS_OK;save()});
+  else if(a==='obs-ok')keep(()=>{p.cierre.obs=OBS_OK;save()});
+  else if(a==='close-permit'){if(!cierreOk())return;p.status='cerrado';p.cierre.fecha=new Date().toLocaleString('es-CO');save();ui.view='doc';render();toast('Permiso cerrado')}
+  else if(a==='close-ats'){if(!p.cierre.firma)return;p.status='cerrado';p.cierre.fecha=new Date().toLocaleString('es-CO');save();ui.view='doc';render();toast('ATS cerrado')}
+});
+document.addEventListener('input',e=>{
+  const t=e.target,p=P();if(!p)return;const d=t.dataset;
+  if(d.gen)p.gen[d.gen]=t.value;
+  else if(d.root)p[d.root]=t.value;
+  else if(d.obs){p.checks[d.obs]=p.checks[d.obs]||{};p.checks[d.obs].obs=t.value}
+  else if(d.sig){p.firmas[d.sig]=p.firmas[d.sig]||{};p.firmas[d.sig][d.field]=t.value}
+  else if(d.w!==undefined)p.trabajadores[+d.w][d.field]=t.value;
+  else if(d.aw!==undefined)p.workers[+d.aw][d.field]=t.value;
+  else if(d.e!==undefined)p.etapas[+d.e][d.field]=t.value;
+  else if(d.cierre)p.cierre[d.cierre]=t.value;
+  else return;
+  save();
+});
+document.addEventListener('change',e=>{
+  const t=e.target,p=P();
+  if(t.id==='g-altura'||t.id==='a-ini'){if(t.id==='a-ini'&&p.gen.inicio){p.gen.fin=addDays(p.gen.inicio,6);save()}keep()}
+  if(t.id==='g-foto'&&t.files[0]){const fr=new FileReader();fr.onload=()=>{const img=new Image();img.onload=()=>{const c=document.createElement('canvas'),k=Math.min(1,1000/img.width);c.width=img.width*k;c.height=img.height*k;c.getContext('2d').drawImage(img,0,0,c.width,c.height);p.gen.foto=c.toDataURL('image/jpeg',.7);save();keep();toast('Foto agregada')};img.src=fr.result};fr.readAsDataURL(t.files[0])}
+});
+document.addEventListener('change',e=>{if(/^(fc-|wc-|aw-c-|iq-ic|iq-uc|pd-ced)/.test(e.target.id))keep()});
+async function sha256(t){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+document.addEventListener('submit',async e=>{
+  if(e.target.id!=='loginf')return;e.preventDefault();
+  const c=$('#lc').value.trim(),pin=$('#lp').value.trim();let u;
+  if(PROD){const h=await sha256(c+':'+pin);u=(S.usuarios||[]).find(x=>String(x.cedula)===c&&x.h===h)}
+  else u=USERS.find(u=>u.cedula===c&&u.pin===pin);
+  if(!u){$('#lerr').hidden=false;return}
+  S.user={nombre:u.nombre,rol:u.rol,cedula:String(u.cedula)};save();ui.view='home';render();
+  if(typeof fromHash==='function')fromHash();
+});
+$('#logout').onclick=()=>{S.user=null;save();ui={view:'login',pid:null,step:0};render()};
+render();
+</script>
+
+<script>
+/* =================== Módulo: inspección de equipos con QR · FT-SST-057 =================== */
+const APP_URL=PROD?location.origin+location.pathname:'https://claude.ai/artifact/JsjixhiH4YhN6nnF9qjBii';
+const CATS={alturas:'Equipos de alturas',electricas:'Herramientas eléctricas',manuales:'Herramientas manuales'};
+const FREQ={alturas:30,electricas:30,manuales:90};
+const ALT_BASE=['El equipo NO ha detenido una caída','Etiqueta legible (marca, serial, fecha de fabricación y norma)','Está dentro de la vida útil indicada por el fabricante'];
+const ELE_BASE=['Cable de alimentación sin cortes, aplastamientos ni empalmes','Clavija con polo a tierra completa y en buen estado','Interruptor funciona y no se queda trabado','Carcasa sin fisuras ni piezas sueltas','No presenta calentamiento, chispas ni ruidos anormales'];
+const MAN_BASE=['Mango firme, sin astillas, fisuras ni reparaciones con cinta o alambre','Cabeza o parte de trabajo bien ajustada al mango','Parte de trabajo sin desgaste, rebabas ni deformación','Sin oxidación excesiva','Herramienta original, no hechiza ni modificada'];
+const TIPOS={
+  ARN:{cat:'alturas',n:'Arnés de cuerpo completo',items:[...ALT_BASE,'Reatas sin cortes, deshilachados, quemaduras térmicas o químicas, ni abrasión','Costuras completas, sin hilos sueltos, rotos o estirados','Argollas D y piezas metálicas sin fisuras, óxido, desgaste ni bordes cortantes','Hebillas, pasadores y ajustes funcionan y cierran bien','Indicador de impacto sin activar','Sin manchas de pintura, químicos ni modificaciones']},
+  ESA:{cat:'alturas',n:'Eslinga con absorbedor de energía',items:[...ALT_BASE,'Reata o cuerda sin cortes, nudos, quemaduras ni abrasión','Absorbedor intacto, sin elongación (costura testigo cerrada)','Funda del absorbedor íntegra','Ganchos con doble seguro automático funcional, sin óxido ni deformación','Costuras completas']},
+  ESP:{cat:'alturas',n:'Eslinga de posicionamiento',items:[...ALT_BASE,'Reata o cuerda sin cortes, nudos ni abrasión','El ajustador regula y bloquea bien','Ganchos con doble seguro automático funcional','Costuras completas']},
+  CON:{cat:'alturas',n:'Conector / mosquetón',items:[...ALT_BASE,'Cuerpo sin fisuras, deformaciones ni bordes cortantes','La compuerta cierra sola y queda alineada','El seguro (rosca o automático) funciona','Sin óxido ni corrosión','Marcación de resistencia legible (kN)']},
+  LDV:{cat:'alturas',n:'Línea de vida portátil',items:[...ALT_BASE,'Cuerda o cable sin cortes, aplastamientos, nudos, moho ni rigidez','Terminales, guardacabos y costuras en buen estado','Tensor y conectores funcionan']},
+  ARR:{cat:'alturas',n:'Arrestador de caídas',items:[...ALT_BASE,'El mecanismo bloquea al halarlo','Sin óxido, golpes ni deformación','Compatible con el diámetro de la cuerda o cable','Pasador o seguro funciona']},
+  ANC:{cat:'alturas',n:'Anclaje portátil (tie-off)',items:[...ALT_BASE,'Cinta o cable sin cortes, nudos, desgaste ni moho','Argollas sin deformación ni óxido','Resistencia marcada legible (mínimo 5.000 lb)']},
+  PUL:{cat:'electricas',n:'Pulidora',items:[...ELE_BASE,'Guarda de protección instalada y ajustada','Disco adecuado para el material y las RPM, sin fisuras','Mango auxiliar instalado']},
+  TAL:{cat:'electricas',n:'Taladro',items:[...ELE_BASE,'Broca adecuada y bien ajustada en el mandril','Mango auxiliar instalado']},
+  ROT:{cat:'electricas',n:'Rotomartillo',items:[...ELE_BASE,'Broca o cincel adecuado y bien ajustado','Mango auxiliar instalado']},
+  SIE:{cat:'electricas',n:'Sierra circular',items:[...ELE_BASE,'Guarda retráctil funciona','Disco afilado y sin dientes faltantes']},
+  EXT:{cat:'electricas',n:'Extensión eléctrica',items:['Cable sin cortes, empalmes ni aislamiento dañado','Clavija y tomas en buen estado, con polo a tierra','Calibre adecuado para la carga que se conectará','Carrete o caja sin fisuras']},
+  MAR:{cat:'manuales',n:'Martillo / maceta',items:MAN_BASE},
+  PAL:{cat:'manuales',n:'Pala',items:MAN_BASE},
+  BAR:{cat:'manuales',n:'Barra',items:['Sin fisuras, dobleces ni deformación','Puntas sin rebabas ni desgaste excesivo','Sin oxidación excesiva']},
+  LLA:{cat:'manuales',n:'Llaves / alicates / destornilladores',items:MAN_BASE},
+  CAR:{cat:'manuales',n:'Carretilla',items:['Llanta inflada y sin daños','Estructura sin fisuras ni soldaduras rotas','Manijas firmes y con agarre','Platón sin perforaciones']}
+};
+const RES={apto:'Apto',fuera:'Fuera de servicio',baja:'Dado de baja'};
+
+/* --- datos de ejemplo (relativos a hoy) --- */
+function seedEq(){
+  const t=today(),d=n=>addDays(t,n);
+  const eq=(code,tipo,nombre,marca,serial,fab,vence,obra,resp,estado,last,days)=>({code,tipo,nombre,marca,modelo:'',serial,fabricacion:fab,servicio:fab,vence,obra,responsable:resp,frecuencia:FREQ[TIPOS[tipo].cat],foto:'',estado,ejemplo:true,creado:d(-200)});
+  const E=[
+    eq('JMA-ARN-001','ARN','Arnés multipropósito 4 argollas','Arseg','A2023-1187',d(-700),d(1100),'Edificio Mirador','Oficial de obra','apto'),
+    eq('JMA-ARN-002','ARN','Arnés multipropósito 4 argollas','Arseg','A2021-0452',d(-1650),d(60),'Edificio Mirador','Oficial de obra','apto'),
+    eq('JMA-ESA-001','ESA','Eslinga en Y con absorbedor','Steelpro','E2022-3310',d(-900),d(900),'Edificio Mirador','Oficial de obra','baja'),
+    eq('JMA-PUL-001','PUL','Pulidora 4 ½"','DeWalt','PD-77821',d(-400),'','Bodega central','Maestro de obra','fuera'),
+    eq('JMA-TAL-001','TAL','Taladro percutor ½"','Bosch','BT-55120',d(-500),'','Edificio Mirador','Maestro de obra','apto'),
+    eq('JMA-EXT-001','EXT','Extensión 20 m calibre 12','Procables','',d(-300),'','Edificio Mirador','Maestro de obra','apto')
+  ];
+  const I=[];const ins=(code,fecha,res,nc,obs,accion)=>{const tp=TIPOS[code.split('-')[1]];const checks={};tp.items.forEach((_,i)=>checks[i]={v:'c'});(nc||[]).forEach(i=>checks[i]={v:'nc',obs:obs});I.push({id:'i'+I.length,code,fecha,hora:'07:15',tipo:'periodica',obra:'Edificio Mirador',checks,foto:'',resultado:res,accion:accion||'',obs:obs||'',inspector:{nombre:'Coordinador SST',cedula:'',img:''},usuario:{nombre:'',cedula:'',img:''},ejemplo:true})};
+  ins('JMA-ARN-001',d(-12),'apto');ins('JMA-ARN-002',d(-38),'apto');ins('JMA-ESA-001',d(-5),'baja',[4],'Costura testigo del absorbedor abierta','baja');
+  ins('JMA-PUL-001',d(-3),'fuera',[0,5],'Cable con empalme y guarda suelta','mant');ins('JMA-TAL-001',d(-27),'apto');
+  return{E,I};
+}
+if(!S.equipos){const s=PROD?{E:[],I:[]}:seedEq();S.equipos=s.E;S.insps=s.I;save()}
+S.insps=S.insps||[];
+
+/* --- descargas: en el prototipo usa el permiso del visor; en la app instalada, descarga normal del navegador --- */
+async function getDL(){if(!PROD)return await window.claude?.use?.('downloads');return{save:async({filename,data})=>{const bl=data instanceof Blob?data:new Blob([data]);const a=document.createElement('a');a.href=URL.createObjectURL(bl);a.download=filename;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},2000);return{status:'saved'}}}}
+/* --- utilidades del módulo --- */
+const EQ=code=>S.equipos.find(e=>e.code===code);
+const lastInsp=code=>S.insps.filter(i=>i.code===code&&!i.borrador).sort((a,b)=>(b.fecha+b.hora).localeCompare(a.fecha+a.hora))[0];
+function nextDue(e){const l=lastInsp(e.code);return l?addDays(l.fecha,+e.frecuencia||30):null}
+function dueState(e){if(e.estado==='baja')return null;const n=nextDue(e),t=today();if(!n)return{k:'venc',l:'Sin inspección'};if(n<t)return{k:'venc',l:'Vencida desde '+n};if(n<=addDays(t,7))return{k:'prox',l:'Vence '+n};return null}
+function lifeState(e){if(!e.vence||e.estado==='baja')return null;const t=today();if(e.vence<t)return{k:'venc',l:'Vida útil vencida'};if(e.vence<=addDays(t,90))return{k:'prox',l:'Vida útil vence '+e.vence};return null}
+function nextCode(tipo){const n=S.equipos.filter(e=>e.tipo===tipo).length+1;let c;let i=n;do{c=`JMA-${tipo}-${String(i).padStart(3,'0')}`;i++}while(EQ(c));return c}
+const eqThumb=e=>e.foto?`<img class="thumb" src="${e.foto}" alt="">`:`<span class="thumb">${e.tipo}</span>`;
+function resizePhoto(file,cb){const fr=new FileReader();fr.onload=()=>{const img=new Image();img.onload=()=>{const c=document.createElement('canvas'),k=Math.min(1,900/img.width);c.width=img.width*k;c.height=img.height*k;c.getContext('2d').drawImage(img,0,0,c.width,c.height);cb(c.toDataURL('image/jpeg',.7))};img.src=fr.result};fr.readAsDataURL(file)}
+
+/* --- inicio --- */
+function homeQ(){
+  const att=S.equipos.filter(e=>dueState(e)||e.estado==='fuera').length;
+  return `<div class="newgrid">
+    <button class="newcard" data-q="equipos"><span class="plus" style="background:var(--verde);color:var(--negro)">✓</span><span><b>Inspección de equipos con QR</b><span class="code">FT-SST-057 · ${S.equipos.filter(e=>e.estado!=='baja').length} equipos activos</span></span></button>
+    <button class="newcard" data-q="tablero"><span class="plus" style="background:var(--amarillo);color:var(--negro)">${att}</span><span><b>Tablero de seguimiento</b><span class="code">${att} equipo(s) requieren atención</span></span></button>
+  </div>`;
+}
+
+/* --- render del módulo --- */
+function renderQ(v,app,bar,bi){
+  if(v==='equipos'){app.innerHTML=vEquipos();bar.hidden=false;bi.innerHTML=`<button class="btn" data-act="home">Inicio</button><button class="btn primary" data-q="eqnew">+ Registrar equipo</button>`}
+  else if(v==='equipo'){app.innerHTML=vEquipo();drawQR();const e=EQ(ui.eq);bar.hidden=false;bi.innerHTML=`<button class="btn" data-q="equipos">Equipos</button>${e.estado==='baja'?'':`<button class="btn primary" data-q="inspnew">Inspeccionar ahora</button>`}`}
+  else if(v==='eqform'){app.innerHTML=vEqForm();bar.hidden=false;bi.innerHTML=`<button class="btn" data-q="${ui.eqf.isNew?'equipos':'equipo'}">Cancelar</button><button class="btn primary" data-q="eqsave">Guardar equipo</button>`}
+  else if(v==='insp'){app.innerHTML=vInsp();bar.hidden=false;const last=ui.step===3;bi.innerHTML=`${ui.step===0?'<button class="btn" data-q="equipo">Cancelar</button>':'<button class="btn" data-q="iprev">Atrás</button>'}${last?`<button class="btn primary" data-q="isave" ${inspIssues().length?'disabled':''}>Guardar inspección</button>`:'<button class="btn primary" data-q="inext">Siguiente</button>'}`}
+  else if(v==='inspdoc'){app.innerHTML=vInspDoc();bar.hidden=false;bi.innerHTML=`<button class="btn" data-q="equipo">Hoja de vida</button><button class="btn primary" data-q="tablero">Tablero</button>`}
+  else if(v==='tablero'){app.innerHTML=vTablero();bar.hidden=false;bi.innerHTML=`<button class="btn" data-act="home">Inicio</button><button class="btn primary" data-q="equipos">Ver equipos</button>`}
+  else if(typeof renderV==='function')renderV(v,app,bar,bi);
+}
+
+/* --- lista de equipos --- */
+function vEquipos(){
+  const f=ui.eqfilter||'todos',q=(ui.eqq||'').toLowerCase();
+  const list=S.equipos.filter(e=>(f==='todos'||TIPOS[e.tipo].cat===f)&&(!q||(e.code+' '+e.nombre+' '+e.serial+' '+e.obra).toLowerCase().includes(q)));
+  return `<div class="stephead"><span class="eyebrow">Inventario · FT-SST-057</span><h1>Equipos y herramientas</h1></div>
+  <div class="stack">
+    <div class="card" style="gap:12px"><h3>Escanear código QR</h3>
+      <p class="muted" style="margin:0;font-size:14px">Toma una foto del código pegado en el equipo, o escribe el código.</p>
+      <label class="btn primary" for="qrfile">Tomar foto del QR</label><input type="file" id="qrfile" accept="image/*" capture="environment" hidden>
+      <div class="search"><input class="in" id="eqq" placeholder="Buscar por código, nombre, serial u obra" value="${esc(ui.eqq||'')}"></div></div>
+    <div class="chips">${[['todos','Todos'],...Object.entries(CATS)].map(([k,l])=>`<button class="chip" data-q="eqfilter" data-v="${k}" aria-pressed="${f===k}">${l}</button>`).join('')}</div>
+    <div class="plist">${list.length?list.map(e=>{const d=dueState(e),l=lifeState(e);return `<button class="eqitem" data-q="open-eq" data-code="${e.code}">${eqThumb(e)}<div class="main"><span class="code">${e.code}</span><b>${esc(e.nombre||TIPOS[e.tipo].n)}</b><span style="font-size:13px;color:var(--muted)">${esc(e.obra||'Sin obra asignada')}</span></div><div class="tags"><span class="pill ${e.estado}">${RES[e.estado]}</span>${d?`<span class="pill ${d.k}">${esc(d.l)}</span>`:''}${l?`<span class="pill ${l.k}">${esc(l.l)}</span>`:''}${e.ejemplo?'<span class="pill ej">Ejemplo</span>':''}</div></button>`}).join(''):'<p class="muted">No hay equipos con ese filtro. Registra el primero con el botón de abajo.</p>'}</div>
+  </div>`;
+}
+
+/* --- hoja de vida --- */
+function vEquipo(){
+  const e=EQ(ui.eq),tp=TIPOS[e.tipo],hist=S.insps.filter(i=>i.code===e.code&&!i.borrador).sort((a,b)=>(b.fecha+b.hora).localeCompare(a.fecha+a.hora));
+  const d=dueState(e),l=lifeState(e),n=nextDue(e);
+  return `<div class="stephead"><span class="eyebrow">Hoja de vida · ${CATS[tp.cat]}</span><h1>${esc(e.nombre||tp.n)}</h1>
+    <div class="row"><span class="pill ${e.estado}">${RES[e.estado]}</span>${d?`<span class="pill ${d.k}">${esc(d.l)}</span>`:''}${l?`<span class="pill ${l.k}">${esc(l.l)}</span>`:''}${e.ejemplo?'<span class="pill ej">Ejemplo</span>':''}</div></div>
+  <div class="stack">
+    ${e.estado==='fuera'?'<p class="note" style="border-color:var(--amarillo)">Fuera de servicio: no se puede usar hasta repararlo y aprobar una nueva inspección.</p>':''}
+    ${e.estado==='baja'?'<p class="note" style="border-color:var(--rojo)">Dado de baja: se retira de la obra y se inutiliza para que nadie lo vuelva a usar.</p>':''}
+    <div class="card"><div class="hv">${e.foto?`<img class="ph" src="${e.foto}" alt="Foto del equipo">`:'<div class="ph">Sin foto de referencia</div>'}
+      <dl class="kv"><dt>Código</dt><dd class="code">${e.code}</dd><dt>Tipo</dt><dd>${tp.n}</dd><dt>Marca</dt><dd>${esc(e.marca||'—')}</dd><dt>Modelo</dt><dd>${esc(e.modelo||'—')}</dd><dt>Serial / lote</dt><dd>${esc(e.serial||'—')}</dd><dt>Fabricación</dt><dd>${esc(e.fabricacion||'—')}</dd><dt>En servicio desde</dt><dd>${esc(e.servicio||'—')}</dd><dt>Fin de vida útil</dt><dd>${esc(e.vence||'No aplica')}</dd><dt>Obra</dt><dd>${esc(e.obra||'—')}</dd><dt>Responsable</dt><dd>${esc(e.responsable||'—')}</dd><dt>Inspeccionar cada</dt><dd>${esc(e.frecuencia)} días</dd><dt>Próxima inspección</dt><dd>${n||'Ahora'}</dd></dl></div>
+      <button class="link" data-q="eqedit" style="align-self:flex-start">Editar datos del equipo</button></div>
+    <div class="card"><h3>Código QR del equipo</h3><div class="qrwrap"><div class="qrbox" id="qrbox"></div><div class="stack" style="gap:8px;flex:1;min-width:180px"><p class="muted" style="margin:0;font-size:14px">Pégalo en el equipo con una etiqueta resistente. Al escanearlo con la cámara del celular, se abre esta hoja de vida.</p><button class="btn small" data-q="label">Descargar etiqueta (PNG)</button></div></div></div>
+    <div class="card"><h3>Historial de inspecciones</h3>${hist.length?`<div class="hist">${hist.map(i=>`<button data-q="open-insp" data-id="${i.id}"><span><b style="font-weight:500">${i.fecha}</b> · ${i.tipo==='preuso'?'Preuso':'Periódica'}<br><span class="muted" style="font-size:13px">${esc(i.inspector.nombre||'')}${i.obs?' · '+esc(i.obs):''}</span></span><span class="pill ${i.resultado}">${RES[i.resultado]}</span></button>`).join('')}</div>`:'<p class="muted" style="margin:0">Todavía no tiene inspecciones.</p>'}</div>
+  </div>`;
+}
+function qrText(code){return APP_URL+'#'+code}
+function drawQR(){const b=document.getElementById('qrbox');if(!b)return;if(typeof QRCode==='undefined'){b.innerHTML='<span class="muted" style="font-size:12px">El QR necesita internet la primera vez</span>';return}b.innerHTML='';new QRCode(b,{text:qrText(ui.eq),width:260,height:260,correctLevel:QRCode.CorrectLevel.M})}
+async function downloadLabel(){
+  const e=EQ(ui.eq);if(typeof QRCode==='undefined'){toast('Conéctate a internet para generar el QR');return}
+  const tmp=document.createElement('div');new QRCode(tmp,{text:qrText(e.code),width:520,height:520,correctLevel:QRCode.CorrectLevel.M});
+  const qc=tmp.querySelector('canvas');const W=700,H=900,c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
+  x.fillStyle='#fff';x.fillRect(0,0,W,H);x.strokeStyle='#134680';x.lineWidth=8;x.strokeRect(4,4,W-8,H-8);
+  await new Promise(r=>{const lg=new Image();lg.onload=()=>{const h=90,w=lg.width*h/lg.height;x.drawImage(lg,(W-w)/2,30,w,h);r()};lg.onerror=r;lg.src=LOGO_H});
+  x.drawImage(qc,90,140,520,520);
+  x.fillStyle='#134680';x.font='700 56px Ubuntu, sans-serif';x.textAlign='center';x.fillText(e.code,W/2,730);
+  x.fillStyle='#000';x.font='500 30px Ubuntu, sans-serif';x.fillText((e.nombre||TIPOS[e.tipo].n).slice(0,38),W/2,780);
+  x.fillStyle='#414141';x.font='400 24px Ubuntu, sans-serif';x.fillText('SG-SST · Inspección FT-SST-057 · Escanéame antes de usar',W/2,840);
+  const blob=await new Promise(r=>c.toBlob(r,'image/png'));
+  const dl=await getDL();
+  if(!dl){toast('La descarga no está disponible en esta vista');return}
+  try{await dl.save({filename:`Etiqueta-${e.code}.png`,data:blob});toast('Etiqueta descargada')}catch(err){if(err&&err.code!=='declined')toast('No se pudo descargar la etiqueta')}
+}
+
+/* --- registrar / editar equipo --- */
+function vEqForm(){
+  const f=ui.eqf;
+  return `<div class="stephead"><span class="eyebrow">${f.isNew?'Nuevo equipo':'Editar '+f.code}</span><h1>Datos del equipo</h1></div>
+  <div class="card">
+    <label class="f"><span class="req">Tipo de equipo</span><select class="in" id="ef-tipo" data-ef="tipo" ${f.isNew?'':'disabled'}><option value="">Elige…</option>${Object.entries(CATS).map(([ck,cl])=>`<optgroup label="${cl}">${Object.entries(TIPOS).filter(([,t])=>t.cat===ck).map(([k,t])=>`<option value="${k}" ${f.tipo===k?'selected':''}>${t.n}</option>`).join('')}</optgroup>`).join('')}</select></label>
+    ${f.tipo?`<p class="decl">Código asignado: <b class="code" style="color:var(--azul)">${f.code}</b></p>`:''}
+    <label class="f">Descripción<input class="in" id="ef-nombre" data-ef="nombre" value="${esc(f.nombre)}" placeholder="Ej: Arnés multipropósito 4 argollas"></label>
+    <div class="grid2">
+      <label class="f">Marca<input class="in" id="ef-marca" data-ef="marca" value="${esc(f.marca)}"></label>
+      <label class="f">Modelo<input class="in" id="ef-modelo" data-ef="modelo" value="${esc(f.modelo)}"></label>
+      <label class="f">Serial o lote<input class="in" id="ef-serial" data-ef="serial" value="${esc(f.serial)}"></label>
+      <label class="f">Fecha de fabricación<input class="in" type="date" id="ef-fab" data-ef="fabricacion" value="${esc(f.fabricacion)}"></label>
+      <label class="f">En servicio desde<input class="in" type="date" id="ef-serv" data-ef="servicio" value="${esc(f.servicio)}"></label>
+      <label class="f">Fin de vida útil${f.tipo&&TIPOS[f.tipo].cat==='alturas'?' <span class="muted">(según fabricante)</span>':''}<input class="in" type="date" id="ef-vence" data-ef="vence" value="${esc(f.vence)}"></label>
+      <label class="f">Obra o ubicación<input class="in" id="ef-obra" data-ef="obra" value="${esc(f.obra)}"></label>
+      <label class="f">Responsable<input class="in" id="ef-resp" data-ef="responsable" value="${esc(f.responsable)}"></label>
+      <label class="f"><span class="req">Inspeccionar cada (días)</span><input class="in" type="number" min="1" id="ef-freq" data-ef="frecuencia" value="${esc(f.frecuencia)}"></label>
+    </div>
+    <div class="f"><span>Foto de referencia del equipo</span><div class="photo">${f.foto?`<img src="${f.foto}" alt="">`:''}<label class="btn small" for="ef-foto">${f.foto?'Cambiar foto':'Tomar o subir foto'}</label><input id="ef-foto" type="file" accept="image/*" capture="environment" hidden></div></div>
+  </div>`;
+}
+
+/* --- inspección (4 pasos) --- */
+const I_STEPS=['Datos de la inspección','Lista de chequeo','Foto y resultado','Firmas'];
+const D=()=>S.idraft;
+function inspResult(d){const tp=TIPOS[EQ(d.code).tipo];const nc=tp.items.some((_,i)=>(d.checks[i]||{}).v==='nc');if(!nc)return'apto';return tp.cat==='alturas'?'baja':(d.accion==='baja'?'baja':'fuera')}
+function vInsp(){
+  const d=D(),e=EQ(d.code),tp=TIPOS[e.tipo],st=ui.step;let body='';
+  if(st===0)body=`<div class="card">
+      <div class="f"><span class="req">Tipo de inspección</span><div class="seg">${[['preuso','Preuso (diaria)'],['periodica','Periódica (SST)']].map(([k,l])=>`<button type="button" data-q="itipo" data-v="${k}" aria-pressed="${d.tipo===k}">${l}</button>`).join('')}</div></div>
+      <div class="grid2"><label class="f"><span class="req">Fecha</span><input class="in" type="date" id="iq-fecha" data-iq="fecha" value="${esc(d.fecha)}"></label><label class="f">Hora<input class="in" type="time" id="iq-hora" data-iq="hora" value="${esc(d.hora)}"></label></div>
+      <label class="f"><span class="req">Obra o área</span><input class="in" id="iq-obra" data-iq="obra" value="${esc(d.obra)}"></label>
+      <div class="grid2"><label class="f">Trabajador que usa el equipo<input class="in" id="iq-un" data-iqu="nombre" value="${esc(d.usuario.nombre)}"></label><label class="f">Cédula del trabajador<input class="in" id="iq-uc" inputmode="numeric" data-iqu="cedula" value="${esc(d.usuario.cedula)}"></label></div>
+      ${tp.cat==='alturas'&&d.tipo==='periodica'?'<p class="decl">Equipos de alturas: la inspección periódica la hace una persona competente, como lo exige la Resolución 4272 de 2021.</p>':''}
+    </div>`;
+  else if(st===1)body=`<div class="row" style="justify-content:space-between"><span class="muted" style="font-size:14px">C: Cumple · NC: No cumple · N/A: No aplica</span><button class="btn small" data-q="iallc">Pendientes en C</button></div>
+    <div class="items" style="margin-top:12px">${tp.items.map((t,i)=>{const c=d.checks[i]||{};return `<div class="item ${c.v?'v-'+c.v:''}"><p>${esc(t)}</p>
+      <div class="tri cnc">${[['c','C'],['nc','NC'],['na','N/A']].map(([v,l])=>`<button type="button" data-q="icheck" data-i="${i}" data-v="${v}" aria-pressed="${c.v===v}">${l}</button>`).join('')}</div>
+      ${c.v==='nc'?`<input class="in obs" id="iobs-${i}" data-iobs="${i}" placeholder="Describe el daño encontrado" value="${esc(c.obs||'')}">`:''}</div>`}).join('')}</div>`;
+  else if(st===2){const r=inspResult(d);
+    body=`<div class="stack"><div class="card"><h3>Foto del equipo en esta inspección</h3><p class="muted" style="margin:0;font-size:14px">Obligatoria. Si hay un daño, enfoca el daño.</p>
+      <div class="photo">${d.foto?`<img src="${d.foto}" alt="" style="width:160px;height:120px">`:''}<label class="btn ${d.foto?'small':'primary'}" for="iq-foto">${d.foto?'Cambiar foto':'Tomar foto'}</label><input id="iq-foto" type="file" accept="image/*" capture="environment" hidden></div></div>
+      <div class="result ${r==='apto'?'ok':'bad'}"><span class="eyebrow">Resultado</span><b>${r==='apto'?'Apto para usar':tp.cat==='alturas'?'No apto: se da de baja':'No apto: sale de servicio'}</b>
+        <span style="font-size:14px">${r==='apto'?'Todos los puntos cumplen o no aplican.':tp.cat==='alturas'?'Un equipo de protección contra caídas con daño o que detuvo una caída no se repara: se retira definitivamente.':'Elige qué se hace con el equipo:'}</span>
+        ${r!=='apto'&&tp.cat!=='alturas'?`<div class="seg" style="background:var(--blanco)">${[['mant','Enviar a mantenimiento'],['baja','Dar de baja']].map(([k,l])=>`<button type="button" data-q="iacc" data-v="${k}" aria-pressed="${(d.accion||'mant')===k}">${l}</button>`).join('')}</div>`:''}</div>
+      <label class="f">Observaciones<textarea class="in" id="iq-obs" data-iq="obs">${esc(d.obs)}</textarea></label></div>`}
+  else if(st===3){const iss=inspIssues();
+    body=`<div class="stack">
+      <div class="card"><h3>Inspector${d.tipo==='periodica'?' (SST o persona competente)':''}</h3>
+        <div class="grid2"><label class="f"><span class="req">Nombre</span><input class="in" id="iq-in" data-iqi="nombre" value="${esc(d.inspector.nombre)}"></label><label class="f"><span class="req">Cédula</span><input class="in" id="iq-ic" inputmode="numeric" data-iqi="cedula" value="${esc(d.inspector.cedula)}"></label></div>
+        <button type="button" class="sigbox ${d.inspector.img?'has':''}" data-q="isign" data-who="inspector">${d.inspector.img?`<img src="${d.inspector.img}" alt="">`:'Toca para firmar'}</button></div>
+      ${d.usuario.nombre?`<div class="card"><h3>Trabajador: ${esc(d.usuario.nombre)}</h3><button type="button" class="sigbox ${d.usuario.img?'has':''}" data-q="isign" data-who="usuario">${d.usuario.img?`<img src="${d.usuario.img}" alt="">`:'Toca para firmar'}</button></div>`:''}
+      ${iss.length?`<div class="card"><h3>Falta resolver</h3>${iss.map(x=>`<button class="issue" data-q="igoto" data-step="${x.step}"><b>●</b><span>${esc(x.m)} <u>Ir al paso</u></span></button>`).join('')}</div>`:''}
+    </div>`}
+  return `<div class="stephead">
+    <div class="row" style="justify-content:space-between"><span class="eyebrow">Paso ${st+1} de 4 · <span class="code">FT-SST-057</span></span><span class="code" style="color:var(--azul)">${e.code}</span></div>
+    <div class="progress">${I_STEPS.map((_,i)=>`<i class="${i<st?'done':i===st?'cur':''}"></i>`).join('')}</div>
+    <h1>${I_STEPS[st]}</h1><span class="muted">${esc(e.nombre||tp.n)}</span><span class="saved" id="savedat">${stamp()}</span></div>${body}`;
+}
+function inspIssues(){
+  const d=D(),tp=TIPOS[EQ(d.code).tipo],out=[];
+  if(!d.tipo)out.push({step:0,m:'Elige el tipo de inspección.'});
+  if(!d.fecha||!d.obra)out.push({step:0,m:'Falta la fecha o la obra.'});
+  const empty=tp.items.filter((_,i)=>!(d.checks[i]||{}).v).length;if(empty)out.push({step:1,m:`${empty} punto(s) sin revisar.`});
+  tp.items.forEach((t,i)=>{const c=d.checks[i]||{};if(c.v==='nc'&&!(c.obs||'').trim())out.push({step:1,m:`Describe el daño en: "${t}".`})});
+  if(!d.foto)out.push({step:2,m:'Falta la foto del equipo.'});
+  if(!d.inspector.nombre||!d.inspector.cedula||!d.inspector.img)out.push({step:3,m:'Falta nombre, cédula o firma del inspector.'});
+  if(d.usuario.nombre&&!d.usuario.img)out.push({step:3,m:'Falta la firma del trabajador.'});
+  return out;
+}
+function vInspDoc(){
+  const i=S.insps.find(x=>x.id===ui.insp),e=EQ(i.code),tp=TIPOS[e.tipo];
+  return `<div class="stack"><div class="stephead"><span class="eyebrow">Inspección ${i.tipo==='preuso'?'preuso':'periódica'} · ${i.fecha}</span><h1>Registro FT-SST-057</h1><div class="row"><span class="pill ${i.resultado}">${RES[i.resultado]}</span>${i.ejemplo?'<span class="pill ej">Ejemplo</span>':''}</div></div>
+  <p class="note">Así queda el PDF que se archiva en <span class="code">SG-SST JMA / E4.2.4 Inspecciones / FT-SST-057 / ${e.code}</span>.</p>
+  <div class="docwrap"><div class="doc">
+    <table class="hdr"><tr><td rowspan="3" style="width:24%">${LOGO_H?`<img src="${LOGO_H}" alt="J.M.A">`:'<small>Logo J.M.A</small>'}</td><td rowspan="3"><div style="font-size:10px">Sistema de Gestión de la Seguridad y Salud en el Trabajo</div><div class="ttl">FORMATO INSPECCIÓN DE HERRAMIENTAS Y EQUIPOS</div></td><td style="width:24%">Código: <b>FT-SST-057</b></td></tr><tr><td>Versión: 001</td></tr><tr><td>Equipo: ${e.code}</td></tr></table>
+    <table class="sec"><tr><th colspan="4">1. Datos de la inspección y del equipo</th></tr>
+      <tr><td><b>Fecha</b> ${i.fecha} ${i.hora}</td><td><b>Tipo</b> ${i.tipo==='preuso'?'Preuso':'Periódica'}</td><td colspan="2"><b>Obra</b> ${esc(i.obra)}</td></tr>
+      <tr><td><b>Equipo</b> ${tp.n}</td><td><b>Marca</b> ${esc(e.marca)}</td><td><b>Serial</b> ${esc(e.serial)}</td><td><b>Vida útil</b> ${esc(e.vence||'N/A')}</td></tr></table>
+    <table class="sec"><tr><th>2. Lista de chequeo</th><th class="c">C</th><th class="c">NC</th><th class="c">N/A</th><th>Observación</th></tr>${tp.items.map((t,k)=>{const c=i.checks[k]||{};return `<tr><td>${esc(t)}</td><td class="c">${c.v==='c'?'X':''}</td><td class="c no">${c.v==='nc'?'X':''}</td><td class="c">${c.v==='na'?'X':''}</td><td>${esc(c.obs||'')}</td></tr>`}).join('')}</table>
+    <table class="sec"><tr><th colspan="2">3. Resultado</th></tr><tr><td style="width:40%">${i.foto?`<img src="${i.foto}" alt="" style="max-height:120px">`:'Sin foto'}</td><td><b>${RES[i.resultado]}</b>${i.resultado==='fuera'?' · enviado a mantenimiento':''}<br>${esc(i.obs)}</td></tr></table>
+    <table class="sec"><tr><th colspan="2">4. Firmas</th></tr><tr><td><b>Inspector</b><br>${esc(i.inspector.nombre)} · C.C. ${esc(i.inspector.cedula)}<br>${i.inspector.img?`<img src="${i.inspector.img}" alt="">`:''}</td><td><b>Trabajador</b><br>${esc(i.usuario.nombre||'—')} ${i.usuario.cedula?'· C.C. '+esc(i.usuario.cedula):''}<br>${i.usuario.img?`<img src="${i.usuario.img}" alt="">`:''}</td></tr></table>
+  </div></div></div>`;
+}
+
+/* --- tablero --- */
+function vTablero(){
+  const act=S.equipos.filter(e=>e.estado!=='baja');
+  const venc=act.filter(e=>{const d=dueState(e);return d&&d.k==='venc'}),prox=act.filter(e=>{const d=dueState(e);return d&&d.k==='prox'});
+  const fuera=act.filter(e=>e.estado==='fuera'),life=act.filter(e=>lifeState(e)),baja=S.equipos.filter(e=>e.estado==='baja');
+  const aptos=act.filter(e=>e.estado==='apto'&&!(dueState(e)||{}).k);
+  const month=today().slice(0,7),im=S.insps.filter(i=>i.fecha.slice(0,7)===month&&!i.borrador);
+  const att=[...new Set([...fuera,...venc,...prox,...life])];
+  const why=e=>[e.estado==='fuera'?'Fuera de servicio':null,(dueState(e)||{}).l,(lifeState(e)||{}).l].filter(Boolean);
+  const rows=Object.entries(CATS).map(([k,l])=>{const es=S.equipos.filter(e=>TIPOS[e.tipo].cat===k);const c={apto:es.filter(e=>e.estado==='apto').length,fuera:es.filter(e=>e.estado==='fuera').length,baja:es.filter(e=>e.estado==='baja').length};return{l,s:{alturas:'Alturas',electricas:'Eléctricas',manuales:'Manuales'}[k],c,t:es.length}});
+  const max=Math.max(1,...rows.map(r=>r.t));
+  return `<div class="stephead"><span class="eyebrow">Programa de inspecciones · PRG-SST-009</span><h1>Tablero de seguimiento</h1><span class="muted">Corte: ${today()}</span></div>
+  <div class="stack">
+    <div class="kpis">
+      <div class="kpi k-ok"><b>${aptos.length}</b><span>Aptos y al día</span></div>
+      <div class="kpi k-bad"><b>${venc.length}</b><span>Inspección vencida</span></div>
+      <div class="kpi k-warn"><b>${prox.length}</b><span>Vencen en 7 días</span></div>
+      <div class="kpi k-warn"><b>${fuera.length}</b><span>Fuera de servicio</span></div>
+      <div class="kpi k-bad"><b>${life.length}</b><span>Vida útil por vencer o vencida</span></div>
+      <div class="kpi k-az"><b>${im.length}</b><span>Inspecciones este mes</span></div>
+    </div>
+    <div class="card"><h3>Requieren atención</h3>${att.length?`<div class="plist">${att.map(e=>`<button class="eqitem" data-q="open-eq" data-code="${e.code}">${eqThumb(e)}<div class="main"><span class="code">${e.code}</span><b>${esc(e.nombre||TIPOS[e.tipo].n)}</b><span style="font-size:13px;color:var(--rojo)">${why(e).map(esc).join(' · ')}</span></div><span class="chev" style="color:var(--azul);font-size:22px">›</span></button>`).join('')}</div>`:'<div class="okbox">Todos los equipos están al día.</div>'}</div>
+    <div class="card"><h3>Estado por categoría</h3>
+      <div class="legend"><span><i style="background:var(--verde)"></i>Apto</span><span><i style="background:var(--amarillo)"></i>Fuera de servicio</span><span><i style="background:var(--rojo)"></i>Dado de baja</span></div>
+      <div class="barcat">${rows.map(r=>`<div class="r"><span>${r.s}</span><div class="track" style="width:${r.t/max*100}%">${r.t?['apto','fuera','baja'].map(k=>r.c[k]?`<i style="width:${r.c[k]/r.t*100}%;background:var(--${k==='apto'?'verde':k==='fuera'?'amarillo':'rojo'})" title="${RES[k]}: ${r.c[k]}"></i>`:'').join(''):''}</div><b class="code">${r.t}</b></div>`).join('')}</div></div>
+    ${baja.length?`<div class="card"><h3>Dados de baja</h3><div class="hist">${baja.map(e=>`<button data-q="open-eq" data-code="${e.code}"><span><b class="code" style="color:var(--azul)">${e.code}</b> · ${esc(e.nombre||TIPOS[e.tipo].n)}</span><span class="pill baja">Baja</span></button>`).join('')}</div></div>`:''}
+    ${typeof tabVeh==='function'?tabVeh():''}
+    <button class="btn" data-q="csv">Descargar inventario (CSV)</button>
+  </div>`;
+}
+async function downloadCSV(){
+  const cols=['Código','Tipo','Categoría','Descripción','Marca','Modelo','Serial','Fabricación','En servicio','Fin vida útil','Obra','Responsable','Estado','Última inspección','Próxima inspección'];
+  const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
+  const lines=[cols.map(q).join(';'),...S.equipos.map(e=>{const l=lastInsp(e.code);return[e.code,TIPOS[e.tipo].n,CATS[TIPOS[e.tipo].cat],e.nombre,e.marca,e.modelo,e.serial,e.fabricacion,e.servicio,e.vence,e.obra,e.responsable,RES[e.estado],l?l.fecha:'',e.estado==='baja'?'':nextDue(e)||'Ahora'].map(q).join(';')})];
+  const dl=await getDL();if(!dl){toast('La descarga no está disponible en esta vista');return}
+  try{await dl.save({filename:`Inventario-equipos-${today()}.csv`,data:'﻿'+lines.join('\r\n')});toast('Inventario descargado')}catch(err){if(err&&err.code!=='declined')toast('No se pudo descargar')}
+}
+
+/* --- firma (reutiliza el panel de firma) --- */
+function signTo(label,setter,ced){if(typeof signModal==='function')return signModal(label,ced,setter);
+  const m=document.createElement('div');m.className='modal';
+  m.innerHTML=`<div><div class="eyebrow">Firma</div><h1 style="font-size:20px;line-height:28px">${esc(label)}</h1></div><canvas aria-label="Área de firma"></canvas><div class="row"><button class="btn" id="sx">Cancelar</button><button class="btn" id="sc">Borrar</button><button class="btn primary" id="sok">Guardar firma</button></div>`;
+  document.body.appendChild(m);const cv=m.querySelector('canvas'),ctx=cv.getContext('2d');let dr=false,has=false,last;
+  const size=()=>{const r=cv.getBoundingClientRect(),dp=devicePixelRatio||1;cv.width=r.width*dp;cv.height=r.height*dp;ctx.setTransform(dp,0,0,dp,0,0);ctx.lineWidth=2.6;ctx.lineCap='round';ctx.strokeStyle='#134680';ctx.fillStyle='#134680';has=false};
+  size();const ro=new ResizeObserver(size);ro.observe(cv);const pt=e=>{const r=cv.getBoundingClientRect();return[e.clientX-r.left,e.clientY-r.top]};
+  cv.onpointerdown=e=>{dr=true;last=pt(e);cv.setPointerCapture(e.pointerId);ctx.beginPath();ctx.arc(last[0],last[1],1.2,0,7);ctx.fill();has=true};
+  cv.onpointermove=e=>{if(!dr)return;const q=pt(e);ctx.beginPath();ctx.moveTo(...last);ctx.lineTo(...q);ctx.stroke();last=q};
+  cv.onpointerup=cv.onpointercancel=()=>dr=false;
+  const close=()=>{ro.disconnect();m.remove()};m.querySelector('#sx').onclick=close;m.querySelector('#sc').onclick=()=>{ctx.clearRect(0,0,cv.width,cv.height);has=false};
+  m.querySelector('#sok').onclick=()=>{if(!has){toast('Dibuja la firma antes de guardar');return}setter(cv.toDataURL('image/png'));save();close();keep();toast('Firma guardada')};
+}
+
+/* --- lectura de QR desde foto --- */
+function decodeQR(file){
+  if(typeof jsQR==='undefined'){toast('El lector de QR necesita internet la primera vez');return}
+  const fr=new FileReader();fr.onload=()=>{const img=new Image();img.onload=()=>{const k=Math.min(1,1200/Math.max(img.width,img.height)),c=document.createElement('canvas');c.width=img.width*k;c.height=img.height*k;const x=c.getContext('2d');x.drawImage(img,0,0,c.width,c.height);const d=x.getImageData(0,0,c.width,c.height);const r=jsQR(d.data,c.width,c.height);
+    if(!r){toast('No se encontró un QR en la foto. Acércate y enfoca bien.');return}
+    const code=(r.data.split('#')[1]||r.data).trim();if(EQ(code))openEq(code);else toast('El código '+code+' no está en el inventario')};img.src=fr.result};fr.readAsDataURL(file);
+}
+function openEq(code){ui.view='equipo';ui.eq=code;render()}
+
+/* --- eventos del módulo --- */
+document.addEventListener('click',ev=>{
+  const b=ev.target.closest('[data-q]');if(!b)return;const a=b.dataset.q;
+  if(a==='equipos'){ui.view='equipos';render()}
+  else if(a==='tablero'){ui.view='tablero';render()}
+  else if(a==='equipo'){ui.view='equipo';render()}
+  else if(a==='eqfilter'){ui.eqfilter=b.dataset.v;keep()}
+  else if(a==='open-eq')openEq(b.dataset.code);
+  else if(a==='eqnew'){ui.eqf={isNew:true,tipo:'',code:'',nombre:'',marca:'',modelo:'',serial:'',fabricacion:'',servicio:today(),vence:'',obra:'',responsable:'',frecuencia:30,foto:'',estado:'apto'};ui.view='eqform';render()}
+  else if(a==='eqedit'){ui.eqf={...EQ(ui.eq),isNew:false};ui.view='eqform';render()}
+  else if(a==='eqsave'){const f=ui.eqf;if(!f.tipo){toast('Elige el tipo de equipo');return}if(!(+f.frecuencia>0)){toast('Indica cada cuántos días se inspecciona');return}
+    const{isNew,...data}=f;if(isNew){data.creado=today();S.equipos.push(data)}else Object.assign(EQ(f.code),data);save();ui.eq=f.code;ui.view='equipo';render();toast(isNew?'Equipo registrado con código '+f.code:'Datos guardados')}
+  else if(a==='label')downloadLabel();
+  else if(a==='csv')downloadCSV();
+  else if(a==='inspnew'){const e=EQ(ui.eq);S.idraft={id:'i'+Date.now(),code:e.code,fecha:today(),hora:new Date().toTimeString().slice(0,5),tipo:'',obra:e.obra||'',checks:{},foto:'',accion:'',obs:'',inspector:{nombre:S.user?S.user.nombre:'',cedula:S.user?S.user.cedula:'',img:''},usuario:{nombre:'',cedula:'',img:''}};ui.step=0;ui.view='insp';save();render()}
+  else if(a==='inext'){ui.step++;render()}
+  else if(a==='iprev'){ui.step--;render()}
+  else if(a==='igoto'){ui.step=+b.dataset.step;render()}
+  else if(a==='itipo')keep(()=>{D().tipo=b.dataset.v;save()});
+  else if(a==='icheck')keep(()=>{const d=D(),i=b.dataset.i;d.checks[i]=d.checks[i]||{};d.checks[i].v=b.dataset.v;save()});
+  else if(a==='iallc')keep(()=>{const d=D();TIPOS[EQ(d.code).tipo].items.forEach((_,i)=>{d.checks[i]=d.checks[i]||{};if(!d.checks[i].v)d.checks[i].v='c'});save();toast('Los pendientes quedaron en C. Revisa cada uno.')});
+  else if(a==='iacc')keep(()=>{D().accion=b.dataset.v;save()});
+  else if(a==='isign'){const who=b.dataset.who,d=D();signTo(who==='inspector'?'Inspector':'Trabajador: '+d.usuario.nombre,u=>d[who].img=u,d[who].cedula)}
+  else if(a==='isave'){const d=D();if(inspIssues().length)return;d.resultado=inspResult(d);if(d.resultado==='fuera')d.accion='mant';S.insps.push(d);const e=EQ(d.code);e.estado=d.resultado;S.idraft=null;save();ui.insp=d.id;ui.view='inspdoc';render();toast(d.resultado==='apto'?'Inspección guardada: equipo apto':'Inspección guardada: equipo '+RES[d.resultado].toLowerCase())}
+  else if(a==='open-insp'){ui.insp=b.dataset.id;ui.view='inspdoc';render()}
+});
+document.addEventListener('input',ev=>{
+  const t=ev.target,dd=t.dataset;
+  if(t.id==='eqq'){ui.eqq=t.value;const pos=t.selectionStart;render();const n=$('#eqq');n.focus();n.setSelectionRange(pos,pos);return}
+  if(dd.ef){ui.eqf[dd.ef]=t.value;return}
+  const d=D();if(!d)return;
+  if(dd.iq)d[dd.iq]=t.value;else if(dd.iqu)d.usuario[dd.iqu]=t.value;else if(dd.iqi)d.inspector[dd.iqi]=t.value;else if(dd.iobs){d.checks[dd.iobs].obs=t.value}else return;save();
+});
+document.addEventListener('change',ev=>{
+  const t=ev.target;
+  if(t.id==='ef-tipo'){const f=ui.eqf;f.tipo=t.value;if(f.isNew&&f.tipo){f.code=nextCode(f.tipo);f.frecuencia=FREQ[TIPOS[f.tipo].cat];if(!f.nombre)f.nombre=TIPOS[f.tipo].n}keep()}
+  if(t.id==='ef-foto'&&t.files[0])resizePhoto(t.files[0],u=>{ui.eqf.foto=u;keep()});
+  if(t.id==='iq-foto'&&t.files[0])resizePhoto(t.files[0],u=>{D().foto=u;save();keep();toast('Foto agregada')});
+  if(t.id==='qrfile'&&t.files[0])decodeQR(t.files[0]);
+});
+/* abrir la hoja de vida cuando se llega desde un QR (#JMA-XXX-000) */
+function fromHash(){const c=decodeURIComponent(location.hash.slice(1));if(c&&EQ(c)&&S.user){openEq(c);return true}return false}
+addEventListener('hashchange',fromHash);
+if(!fromHash())render();
+</script>
+
+<script>
+/* =================== Módulo: preoperacional de vehículos PESV · FT-SST-130 =================== */
+const VTIPOS=['Camioneta','Automóvil','Campero','Camión','Volqueta','Motocicleta'];
+const DOCS=[
+  {k:'soat',l:'SOAT',h:'Vigente hasta'},
+  {k:'rtm',l:'Revisión técnico-mecánica',h:'Vigente hasta (o exenta hasta, si es nuevo)'},
+  {k:'poliza',l:'Póliza todo riesgo',h:'Vigente hasta (opcional)',opt:1},
+  {k:'extintor',l:'Extintor',h:'Recarga vigente hasta'},
+  {k:'botiquin',l:'Botiquín',h:'Última revisión (se revisa cada 6 meses)',rev:6}
+];
+const VGROUPS=[
+  {k:'frenos',l:'Frenos',items:[['Frenos de pedal y de estacionamiento funcionan',1],['Nivel de líquido de frenos correcto',1]]},
+  {k:'direccion',l:'Dirección',items:[['Dirección sin holgura y funciona bien',1]]},
+  {k:'llantas',l:'Llantas',items:[['Llantas con labrado mínimo de 1,6 mm y sin cortaduras',1],['Pernos y tuercas completos y asegurados',1],['Llanta de repuesto en buen estado y con presión',0,1]]},
+  {k:'luces',l:'Luces',items:[['Luces altas, bajas, de freno y reversa funcionan',1],['Direccionales y luces de parqueo funcionan',1]]},
+  {k:'motor',l:'Motor y fluidos',items:[['Nivel de aceite de motor correcto',0],['Nivel de refrigerante correcto',0,1],['Sin fugas de aceite, refrigerante o combustible',1]]},
+  {k:'seguridad',l:'Cabina y seguridad',items:[['Cinturones de seguridad con anclaje y en buen estado',1,1],['Vidrios y panorámico sin fisuras, buena visibilidad',1,1],['Espejos retrovisores en buen estado y ajustados',1],['Limpiabrisas funcionan y tienen líquido',0,1],['Pito funciona',1]]},
+  {k:'kit',l:'Equipo de carretera',items:[['Kit de carretera completo (tacos, señales, gato, cruceta, herramienta)',0,1],['Casco y chaleco reflectivo del conductor (motocicleta)',1,2]]}
+];
+/* items: [texto, crítico, 1 = no aplica a moto · 2 = solo moto] */
+const isMoto=v=>v.tipo==='Motocicleta';
+const gItems=(v,g)=>g.items.map((it,i)=>({t:it[0],crit:!!it[1],k:g.k+'_'+i,skip:(it[2]===1&&isMoto(v))||(it[2]===2&&!isMoto(v))})).filter(x=>!x.skip);
+function addMonths(s,n){const d=new Date(s+'T12:00');d.setMonth(d.getMonth()+n);return iso(d)}
+function docDue(v,d){const val=v.docs[d.k];if(!val)return null;return d.rev?addMonths(val,d.rev):val}
+function docState(v,d){const due=docDue(v,d),t=today();if(!due)return d.opt?{k:'na',l:'No registrado'}:{k:'venc',l:'Sin fecha registrada'};if(due<t)return{k:'venc',l:(d.rev?'Revisión vencida desde ':'Vencido desde ')+due};if(due<=addDays(t,30))return{k:'prox',l:'Vence '+due};return{k:'ok',l:(d.rev?'Próxima revisión ':'Vigente hasta ')+due}}
+function licState(c){if(!c||!c.licVence)return{k:'venc',l:'Sin fecha de licencia'};const t=today();if(c.licVence<t)return{k:'venc',l:'Licencia vencida desde '+c.licVence};if(c.licVence<=addDays(t,30))return{k:'prox',l:'Licencia vence '+c.licVence};return{k:'ok',l:'Licencia vigente hasta '+c.licVence}}
+
+/* --- datos de ejemplo --- */
+if(!S.vehiculos&&PROD){S.vehiculos=[];S.conductores=[];S.preops=[];save()}
+if(!S.vehiculos){const t=today(),d=n=>addDays(t,n);
+  S.vehiculos=[
+    {placa:'JMA123',tipo:'Camioneta',marca:'Toyota',linea:'Hilux 2.4',modelo:'2022',color:'Blanco',km:48210,estado:'operativo',docs:{soat:d(140),rtm:d(22),poliza:d(200),extintor:d(95),botiquin:d(-120)},ejemplo:true},
+    {placa:'KLM456',tipo:'Automóvil',marca:'Renault',linea:'Logan',modelo:'2019',color:'Gris',km:91544,estado:'operativo',docs:{soat:d(-4),rtm:d(180),poliza:'',extintor:d(-10),botiquin:d(-200)},ejemplo:true},
+    {placa:'ABC12F',tipo:'Motocicleta',marca:'Yamaha',linea:'XTZ 150',modelo:'2023',color:'Azul',km:12030,estado:'operativo',docs:{soat:d(300),rtm:d(400),poliza:'',extintor:'',botiquin:''},ejemplo:true}];
+  S.conductores=[{cedula:'1000000001',nombre:'Usuario de prueba',cat:'C1',licVence:d(600),firma:''}];
+  S.preops=[];save()}
+S.preops=S.preops||[];S.conductores=S.conductores||[];S.conductores.forEach(c=>{if(c.firma&&!regGet(c.cedula))regSet(c.cedula,c.firma)});
+const VEH=p=>S.vehiculos.find(v=>v.placa===p);
+const COND=c=>S.conductores.find(x=>x.cedula===c);
+const lastPre=p=>S.preops.filter(x=>x.placa===p).sort((a,b)=>(b.fecha+b.hora).localeCompare(a.fecha+a.hora))[0];
+const doneToday=p=>S.preops.some(x=>x.placa===p&&x.fecha===today());
+const vAlerts=v=>{const a=DOCS.map(d=>[d,docState(v,d)]).filter(([d,s])=>(s.k==='venc'&&!(d.k==='extintor'&&isMoto(v))&&!(d.k==='botiquin'&&isMoto(v)))||s.k==='prox');return a};
+
+/* --- inicio --- */
+function homeV(){
+  const pend=S.vehiculos.filter(v=>!doneToday(v.placa)&&v.estado!=='inmovilizado').length;
+  return `<button class="newcard" data-pv="lista" style="border-color:var(--verde)"><span class="plus" style="background:var(--verde);color:var(--negro)">${pend}</span><span><b>Preoperacional de vehículo</b><span class="code">FT-SST-130 · ${pend} vehículo(s) sin preoperacional hoy</span></span></button>`;
+}
+
+function renderV(v,app,bar,bi){
+  if(v==='vlista'){app.innerHTML=vLista();bar.hidden=false;bi.innerHTML=`<button class="btn" data-act="home">Inicio</button><button class="btn primary" data-pv="vnew">+ Registrar vehículo</button>`}
+  else if(v==='vform'){app.innerHTML=vForm();bar.hidden=false;bi.innerHTML=`<button class="btn" data-pv="lista">Cancelar</button><button class="btn primary" data-pv="vsave">Guardar vehículo</button>`}
+  else if(v==='preop'){app.innerHTML=vPreop();bar.hidden=false;const st=ui.step;bi.innerHTML=`${st===0?'<button class="btn" data-pv="lista">Cancelar</button>':'<button class="btn" data-pv="pprev">Atrás</button>'}${st<3?'<button class="btn primary" data-pv="pnext">Siguiente</button>':`<button class="btn primary" data-pv="psave" ${preIssues().length?'disabled':''}>Guardar preoperacional</button>`}`}
+  else if(v==='predoc'){app.innerHTML=vPreDoc();bar.hidden=false;bi.innerHTML=`<button class="btn" data-pv="lista">Vehículos</button><button class="btn primary" data-act="home">Inicio</button>`}
+  else if(typeof renderS==='function')renderS(v,app,bar,bi);
+}
+
+/* --- lista de vehículos --- */
+function vLista(){
+  return `<div class="stephead"><span class="eyebrow">PESV · FT-SST-130</span><h1>¿Qué vehículo vas a inspeccionar?</h1><span class="muted">Las fechas de documentos, extintor y botiquín se guardan con el vehículo; solo las actualizas cuando cambian.</span></div>
+  <div class="plist">${S.vehiculos.map(v=>{const al=vAlerts(v),l=lastPre(v.placa),hoy=doneToday(v.placa);return `<div class="card" style="gap:12px">
+    <div class="row" style="justify-content:space-between;align-items:flex-start"><div><b class="code" style="font-size:22px;color:var(--azul);letter-spacing:.08em">${v.placa}</b><div class="muted" style="font-size:14px">${esc(v.tipo)} · ${esc(v.marca)} ${esc(v.linea)} ${esc(v.modelo)}</div></div>
+      <div class="tags">${v.estado==='inmovilizado'?'<span class="pill baja">Inmovilizado</span>':hoy?'<span class="pill apto">Hecho hoy</span>':'<span class="pill borrador">Pendiente hoy</span>'}${v.ejemplo?'<span class="pill ej">Ejemplo</span>':''}</div></div>
+    ${al.length?`<div class="row">${al.map(([d,s])=>`<span class="pill ${s.k}">${d.l}: ${esc(s.l)}</span>`).join('')}</div>`:''}
+    <span class="muted" style="font-size:13px">${l?`Último: ${l.fecha} · ${esc(l.nombre)} · ${l.km.toLocaleString('es-CO')} km`:'Sin preoperacionales registrados'}</span>
+    <div class="row"><button class="btn primary small" data-pv="pnew" data-placa="${v.placa}" style="flex:1">Hacer preoperacional</button><button class="btn small" data-pv="vedit" data-placa="${v.placa}">Datos y fechas</button></div>
+    ${S.preops.some(x=>x.placa===v.placa)?`<div class="hist">${S.preops.filter(x=>x.placa===v.placa).sort((a,b)=>(b.fecha+b.hora).localeCompare(a.fecha+a.hora)).slice(0,3).map(x=>`<button data-pv="open-pre" data-id="${x.id}"><span>${x.fecha} ${x.hora} · ${esc(x.nombre)}</span><span class="pill ${x.resultado==='apto'?'apto':'baja'}">${x.resultado==='apto'?'Apto':'No apto'}</span></button>`).join('')}</div>`:''}
+  </div>`}).join('')}</div>`;
+}
+
+/* --- registrar / editar vehículo --- */
+function vForm(){const f=ui.vf;
+  return `<div class="stephead"><span class="eyebrow">${f.isNew?'Nuevo vehículo':'Vehículo '+f.placa}</span><h1>Datos y fechas</h1></div>
+  <div class="stack"><div class="card">
+    <div class="grid2"><label class="f"><span class="req">Placa</span><input class="in" id="vf-placa" data-vf="placa" value="${esc(f.placa)}" ${f.isNew?'':'disabled'} style="text-transform:uppercase;letter-spacing:.08em;font-weight:500"></label>
+    <label class="f"><span class="req">Tipo</span><select class="in" id="vf-tipo" data-vf="tipo">${VTIPOS.map(t=>`<option ${f.tipo===t?'selected':''}>${t}</option>`).join('')}</select></label>
+    <label class="f">Marca<input class="in" id="vf-marca" data-vf="marca" value="${esc(f.marca)}"></label><label class="f">Línea<input class="in" id="vf-linea" data-vf="linea" value="${esc(f.linea)}"></label>
+    <label class="f">Modelo (año)<input class="in" id="vf-modelo" inputmode="numeric" data-vf="modelo" value="${esc(f.modelo)}"></label><label class="f">Color<input class="in" id="vf-color" data-vf="color" value="${esc(f.color)}"></label>
+    <label class="f">Kilometraje actual<input class="in" type="number" id="vf-km" data-vf="km" value="${esc(f.km)}"></label></div></div>
+    <div class="card"><h3>Documentos y vigencias</h3>${DOCS.map(d=>`<label class="f">${d.l}${d.opt?'':' <span class="req"></span>'}<span class="muted" style="font-weight:400">${d.h}</span><input class="in" type="date" id="vf-${d.k}" data-vfd="${d.k}" value="${esc(f.docs[d.k]||'')}"></label>`).join('')}</div>
+  </div>`}
+
+/* --- preoperacional en 4 pasos --- */
+const P_STEPS=['Vehículo y conductor','Documentos y vigencias','Revisión rápida','Resultado y firma'];
+const PD=()=>S.pdraft;
+function vPreop(){
+  const d=PD(),v=VEH(d.placa),st=ui.step,c=COND(d.cedula);let body='';
+  if(st===0){const lic=licState(c);
+    body=`<div class="card">
+      <div class="row" style="justify-content:space-between"><b class="code" style="font-size:22px;color:var(--azul);letter-spacing:.08em">${v.placa}</b><span class="muted">${esc(v.tipo)} · ${esc(v.marca)} ${esc(v.linea)}</span></div>
+      <div class="grid2"><label class="f"><span class="req">Cédula del conductor</span><input class="in" id="pd-ced" inputmode="numeric" data-pd="cedula" value="${esc(d.cedula)}"></label>
+      <label class="f"><span class="req">Nombre del conductor</span><input class="in" id="pd-nom" data-pd="nombre" value="${esc(d.nombre)}"></label></div>
+      ${c?`<p class="decl">Conductor registrado. ${esc(lic.l)} · Categoría ${esc(c.cat||'—')}.</p>`:`<div class="grid2"><label class="f"><span class="req">Categoría de licencia</span><input class="in" id="pd-cat" data-pd="cat" value="${esc(d.cat)}" placeholder="B1, C1, A2…"></label><label class="f"><span class="req">Licencia vigente hasta</span><input class="in" type="date" id="pd-lic" data-pd="licVence" value="${esc(d.licVence)}"></label></div><p class="muted" style="margin:0;font-size:14px">Se guarda para las próximas veces.</p>`}
+      <label class="f"><span class="req">Kilometraje actual</span><input class="in" type="number" inputmode="numeric" id="pd-km" data-pd="km" value="${esc(d.km)}"><span class="muted" style="font-weight:400">Último registrado: ${(+v.km||0).toLocaleString('es-CO')} km</span></label>
+    </div>`}
+  else if(st===1){
+    body=`<p class="muted" style="margin:0 0 12px">Las fechas vienen del registro del vehículo. Si renovaste algo, toca "Actualizar".</p><div class="items">${DOCS.filter(dd=>!(isMoto(v)&&(dd.k==='extintor'||dd.k==='botiquin'))).map(dd=>{const s=docState(v,dd),ed=ui.pedit===dd.k;return `<div class="item ${s.k==='ok'?'v-c':s.k==='venc'?'v-nc':''}">
+      <div class="row" style="justify-content:space-between"><p>${dd.l}</p><span class="pill ${s.k==='ok'?'apto':s.k==='venc'?'venc':s.k==='prox'?'prox':'borrador'}">${s.k==='ok'?'Al día':s.k==='venc'?'Vencido':s.k==='prox'?'Por vencer':'Opcional'}</span></div>
+      <span style="font-size:14px">${esc(s.l)}</span>
+      ${ed?`<label class="f">${dd.h}<input class="in" type="date" id="pe-${dd.k}" data-pe="${dd.k}" value="${esc(v.docs[dd.k]||'')}"></label><button class="btn small" data-pv="pedit-ok">Listo</button>`:`<div class="row">${dd.rev?`<button class="btn small" data-pv="botiquin-hoy">Lo revisé hoy</button>`:''}<button class="link" data-pv="pedit" data-k="${dd.k}">Actualizar</button></div>`}
+    </div>`}).join('')}</div>`}
+  else if(st===2){
+    body=`<p class="muted" style="margin:0 0 12px">Revisa cada grupo. Si todo está bien, toca "Todo cumple". Si algo falla, toca ese punto para marcarlo como No cumple.</p><div class="stack">${VGROUPS.map(g=>{const its=gItems(v,g);if(!its.length)return'';const done=its.every(it=>d.checks[it.k]);const nc=its.filter(it=>d.checks[it.k]==='nc').length;return `<div class="card" style="gap:10px;border-left:6px solid ${nc?'var(--rojo)':done?'var(--verde)':'var(--line)'}">
+      <div class="row" style="justify-content:space-between"><h3>${g.l}</h3>${done?`<span class="pill ${nc?'baja':'apto'}">${nc?nc+' no cumple':'Cumple'}</span>`:`<button class="btn small primary" data-pv="gok" data-g="${g.k}">Todo cumple</button>`}</div>
+      <div class="chips" style="flex-direction:column;align-items:stretch">${its.map(it=>{const val=d.checks[it.k];return `<button class="chip" data-pv="tog" data-k="${it.k}" style="border-radius:var(--radius-md);text-align:left;${val==='nc'?'background:var(--rojo);border-color:var(--rojo);color:var(--blanco)':val==='c'?'border-color:var(--verde);background:var(--tinte-verde)':''}">${val==='nc'?'✗ ':val==='c'?'✓ ':''}${esc(it.t)}${it.crit?' <span class="tag-cond" style="color:inherit;opacity:.8">· crítico</span>':''}</button>${val==='nc'?`<input class="in obs" id="pobs-${it.k}" data-pobs="${it.k}" placeholder="¿Qué falla?" value="${esc(d.obsItems[it.k]||'')}">`:''}`}).join('')}</div></div>`}).join('')}</div>`}
+  else if(st===3){const r=preResult(),iss=preIssues(),cd=COND(d.cedula);
+    body=`<div class="stack"><div class="result ${r.apto?'ok':'bad'}"><span class="eyebrow">Resultado</span><b>${r.apto?'Apto para operar':'No apto: el vehículo queda inmovilizado'}</b>
+      ${r.motivos.length?`<ul style="margin:0;padding-left:18px;font-size:14px">${r.motivos.map(m=>`<li>${esc(m)}</li>`).join('')}</ul>`:'<span style="font-size:14px">Documentos al día y todos los puntos cumplen.</span>'}
+      ${!r.apto?'<span style="font-size:14px">Avisa al responsable del PESV. El vehículo no sale hasta corregir y hacer un nuevo preoperacional.</span>':''}</div>
+      ${r.hayNC?`<div class="card"><h3>Foto de la falla</h3><p class="muted" style="margin:0;font-size:14px">Obligatoria cuando algo no cumple.</p><div class="photo">${d.foto?`<img src="${d.foto}" alt="" style="width:160px;height:120px">`:''}<label class="btn ${d.foto?'small':'primary'}" for="pd-foto">${d.foto?'Cambiar foto':'Tomar foto'}</label><input id="pd-foto" type="file" accept="image/*" capture="environment" hidden></div></div>`:''}
+      <label class="f">Observaciones<textarea class="in" id="pd-obs" data-pd="obs">${esc(d.obs)}</textarea></label>
+      <div class="card"><h3>Firma del conductor</h3><p class="decl">Declaro que la información de esta inspección es verídica y que revisé el vehículo antes de operarlo.</p>
+        ${regGet(d.cedula)&&!d.firma?`<button class="btn primary" data-pv="usefirma">Firmar con mi firma registrada</button>`:''}
+        <button type="button" class="sigbox ${d.firma?'has':''}" data-pv="psign">${d.firma?`<img src="${d.firma}" alt="">`:'Toca para firmar'}</button>
+</div>
+      ${iss.length?`<div class="card"><h3>Falta resolver</h3>${iss.map(x=>`<button class="issue" data-pv="pgoto" data-step="${x.step}"><b>●</b><span>${esc(x.m)} <u>Ir al paso</u></span></button>`).join('')}</div>`:''}</div>`}
+  return `<div class="stephead"><div class="row" style="justify-content:space-between"><span class="eyebrow">Paso ${st+1} de 4 · <span class="code">FT-SST-130</span></span><span class="code" style="color:var(--azul);letter-spacing:.08em">${v.placa}</span></div>
+    <div class="progress">${P_STEPS.map((_,i)=>`<i class="${i<st?'done':i===st?'cur':''}"></i>`).join('')}</div><h1>${P_STEPS[st]}</h1><span class="saved" id="savedat">${stamp()}</span></div>${body}`;
+}
+function preResult(){
+  const d=PD(),v=VEH(d.placa),motivos=[];let hayNC=false;
+  DOCS.filter(dd=>!dd.opt&&!(isMoto(v)&&(dd.k==='extintor'||dd.k==='botiquin'))).forEach(dd=>{if(docState(v,dd).k==='venc')motivos.push(dd.l+': '+docState(v,dd).l)});
+  const c=COND(d.cedula)||{licVence:d.licVence};if(licState(c).k==='venc')motivos.push(licState(c).l);
+  VGROUPS.forEach(g=>gItems(v,g).forEach(it=>{if(d.checks[it.k]==='nc'){hayNC=true;if(it.crit)motivos.push('Crítico no cumple: '+it.t)}}));
+  return{apto:!motivos.length,motivos,hayNC};
+}
+function preIssues(){
+  const d=PD(),v=VEH(d.placa),out=[];
+  if(!d.cedula||!d.nombre)out.push({step:0,m:'Falta la cédula o el nombre del conductor.'});
+  if(!COND(d.cedula)&&(!d.cat||!d.licVence))out.push({step:0,m:'Falta la categoría o la vigencia de la licencia.'});
+  if(!(+d.km>0))out.push({step:0,m:'Falta el kilometraje.'});else if(+d.km<(+v.km||0))out.push({step:0,m:'El kilometraje es menor que el último registrado.'});
+  const pend=VGROUPS.filter(g=>gItems(v,g).some(it=>!d.checks[it.k])).map(g=>g.l);if(pend.length)out.push({step:2,m:'Grupos sin revisar: '+pend.join(', ')+'.'});
+  VGROUPS.forEach(g=>gItems(v,g).forEach(it=>{if(d.checks[it.k]==='nc'&&!(d.obsItems[it.k]||'').trim())out.push({step:2,m:`Describe la falla: "${it.t}".`})}));
+  if(preResult().hayNC&&!d.foto)out.push({step:3,m:'Falta la foto de la falla.'});
+  if(!d.firma)out.push({step:3,m:'Falta la firma del conductor.'});
+  return out;
+}
+function vPreDoc(){
+  const x=S.preops.find(p=>p.id===ui.pre),v=VEH(x.placa);
+  return `<div class="stack"><div class="stephead"><span class="eyebrow">Preoperacional · ${x.fecha} ${x.hora}</span><h1>Registro FT-SST-130</h1><div class="row"><span class="pill ${x.resultado==='apto'?'apto':'baja'}">${x.resultado==='apto'?'Apto para operar':'No apto · inmovilizado'}</span></div></div>
+  <p class="note">Así queda el PDF que se archiva en <span class="code">SG-SST JMA / PESV / FT-SST-130 / ${x.placa}</span>.</p>
+  <div class="docwrap"><div class="doc">
+    <table class="hdr"><tr><td rowspan="3" style="width:24%">${LOGO_H?`<img src="${LOGO_H}" alt="J.M.A">`:'<small>Logo J.M.A</small>'}</td><td rowspan="3"><div style="font-size:10px">Sistema de Gestión de la Seguridad y Salud en el Trabajo · PESV</div><div class="ttl">FORMATO INSPECCIÓN DIARIA DE VEHÍCULOS</div></td><td style="width:24%">Código: <b>FT-SST-130</b></td></tr><tr><td>Versión: 001</td></tr><tr><td>Placa: ${x.placa}</td></tr></table>
+    <table class="sec"><tr><th colspan="4">1. Vehículo y conductor</th></tr>
+      <tr><td><b>Placa</b> ${x.placa}</td><td><b>Tipo</b> ${esc(v.tipo)}</td><td><b>Marca / línea</b> ${esc(v.marca)} ${esc(v.linea)}</td><td><b>Km</b> ${(+x.km).toLocaleString('es-CO')}</td></tr>
+      <tr><td colspan="2"><b>Conductor</b> ${esc(x.nombre)} · C.C. ${esc(x.cedula)}</td><td colspan="2"><b>Licencia</b> ${esc(x.lic)}</td></tr></table>
+    <table class="sec"><tr><th>2. Documentos y vigencias</th><th>Fecha</th><th class="c">Estado</th></tr>${x.docsSnap.map(s=>`<tr><td>${s.l}</td><td>${esc(s.f||'—')}</td><td class="c ${s.k==='venc'?'no':''}">${s.k==='venc'?'NC':s.k==='na'?'N/A':'C'}</td></tr>`).join('')}</table>
+    <table class="sec"><tr><th>3. Revisión</th><th class="c">C</th><th class="c">NC</th><th>Observación</th></tr>${VGROUPS.map(g=>gItems(v,g).map(it=>`<tr><td>${esc(g.l)} · ${esc(it.t)}</td><td class="c">${x.checks[it.k]==='c'?'X':''}</td><td class="c no">${x.checks[it.k]==='nc'?'X':''}</td><td>${esc(x.obsItems[it.k]||'')}</td></tr>`).join('')).join('')}</table>
+    <table class="sec"><tr><th colspan="2">4. Dictamen y firma</th></tr><tr><td><b>${x.resultado==='apto'?'APTO PARA OPERAR':'NO APTO PARA OPERAR'}</b><br>${x.motivos.map(esc).join('<br>')}<br>${esc(x.obs)}</td><td>${x.foto?`<img src="${x.foto}" alt="" style="max-height:100px">`:''}</td></tr><tr><td colspan="2"><b>Conductor</b> ${esc(x.nombre)}<br><img src="${x.firma}" alt=""></td></tr></table>
+  </div></div></div>`;
+}
+
+/* --- tablero: vehículos --- */
+function tabVeh(){
+  const t=today();const alerts=[];S.vehiculos.forEach(v=>vAlerts(v).forEach(([d,s])=>alerts.push({v,d,s})));
+  S.conductores.forEach(c=>{const l=licState(c);if(l.k!=='ok')alerts.push({c,s:l})});
+  const sin=S.vehiculos.filter(v=>!doneToday(v.placa)&&v.estado!=='inmovilizado'),inm=S.vehiculos.filter(v=>v.estado==='inmovilizado');
+  return `<div class="card"><h3>Vehículos (PESV)</h3>
+    <div class="kpis"><div class="kpi k-ok"><b>${S.vehiculos.length-sin.length-inm.length}</b><span>Con preoperacional hoy</span></div><div class="kpi k-warn"><b>${sin.length}</b><span>Sin preoperacional hoy</span></div><div class="kpi k-bad"><b>${inm.length}</b><span>Inmovilizados</span></div></div>
+    ${alerts.length?`<div class="hist">${alerts.map(a=>`<button data-pv="${a.v?'vedit':'lista'}" data-placa="${a.v?a.v.placa:''}"><span>${a.v?`<b class="code" style="color:var(--azul)">${a.v.placa}</b> · ${a.d.l}`:`Conductor ${esc(a.c.nombre)}`}</span><span class="pill ${a.s.k}">${esc(a.s.l)}</span></button>`).join('')}</div>`:'<div class="okbox">Documentos de vehículos y licencias al día.</div>'}</div>`;
+}
+
+/* --- firma --- */
+function signPre(){const d=PD();signTo('Conductor: '+(d.nombre||''),u=>{d.firma=u},d.cedula)}
+
+/* --- eventos --- */
+document.addEventListener('click',ev=>{
+  const b=ev.target.closest('[data-pv]');if(!b)return;const a=b.dataset.pv;
+  if(a==='lista'){ui.view='vlista';render()}
+  else if(a==='vnew'){ui.vf={isNew:true,placa:'',tipo:'Camioneta',marca:'',linea:'',modelo:'',color:'',km:'',estado:'operativo',docs:{}};ui.view='vform';render()}
+  else if(a==='vedit'){const v=VEH(b.dataset.placa);ui.vf={...v,docs:{...v.docs},isNew:false};ui.view='vform';render()}
+  else if(a==='vsave'){const f=ui.vf;f.placa=(f.placa||'').toUpperCase().replace(/[^A-Z0-9]/g,'');if(!f.placa){toast('Escribe la placa');return}if(f.isNew&&VEH(f.placa)){toast('Esa placa ya está registrada');return}
+    const{isNew,...data}=f;data.km=+data.km||0;if(isNew)S.vehiculos.push(data);else Object.assign(VEH(f.placa),data);save();ui.view='vlista';render();toast('Vehículo guardado')}
+  else if(a==='pnew'){const v=VEH(b.dataset.placa),l=lastPre(v.placa),me=S.user&&COND(S.user.cedula);const c=me||(l&&COND(l.cedula));
+    S.pdraft={id:'v'+Date.now(),placa:v.placa,fecha:today(),hora:new Date().toTimeString().slice(0,5),cedula:c?c.cedula:(S.user?S.user.cedula:''),nombre:c?c.nombre:(S.user?S.user.nombre:''),cat:'',licVence:'',km:'',checks:{},obsItems:{},foto:'',obs:'',firma:'',recordar:true};
+    ui.step=0;ui.pedit=null;ui.view='preop';save();render()}
+  else if(a==='pnext'){ui.step++;ui.pedit=null;render()}
+  else if(a==='pprev'){ui.step--;render()}
+  else if(a==='pgoto'){ui.step=+b.dataset.step;render()}
+  else if(a==='pedit')keep(()=>{ui.pedit=b.dataset.k});
+  else if(a==='pedit-ok')keep(()=>{ui.pedit=null;save()});
+  else if(a==='botiquin-hoy')keep(()=>{VEH(PD().placa).docs.botiquin=today();save();toast('Botiquín revisado hoy. Próxima revisión en 6 meses.')});
+  else if(a==='gok')keep(()=>{const d=PD(),v=VEH(d.placa),g=VGROUPS.find(x=>x.k===b.dataset.g);gItems(v,g).forEach(it=>{if(!d.checks[it.k])d.checks[it.k]='c'});save()});
+  else if(a==='tog')keep(()=>{const d=PD(),k=b.dataset.k;d.checks[k]=d.checks[k]==='nc'?'c':'nc';save()});
+  else if(a==='psign')signPre();
+  else if(a==='usefirma')keep(()=>{const d=PD();d.firma=regGet(d.cedula);save()});
+  else if(a==='psave'){const d=PD(),v=VEH(d.placa);if(preIssues().length)return;const r=preResult();
+    let c=COND(d.cedula);if(!c){c={cedula:d.cedula,nombre:d.nombre,cat:d.cat,licVence:d.licVence,firma:''};S.conductores.push(c)}
+    const rec={...d,km:+d.km,resultado:r.apto?'apto':'noapto',motivos:r.motivos,lic:`${c.cat||''} · vence ${c.licVence||''}`,
+      docsSnap:DOCS.filter(dd=>!(isMoto(v)&&(dd.k==='extintor'||dd.k==='botiquin'))).map(dd=>{const s=docState(v,dd);return{l:dd.l,f:docDue(v,dd)||'',k:s.k}})};
+    S.preops.push(rec);v.km=+d.km;v.estado=r.apto?'operativo':'inmovilizado';S.pdraft=null;save();ui.pre=rec.id;ui.view='predoc';render();toast(r.apto?'Preoperacional guardado: apto':'Preoperacional guardado: vehículo inmovilizado')}
+  else if(a==='open-pre'){ui.pre=b.dataset.id;ui.view='predoc';render()}
+});
+document.addEventListener('input',ev=>{
+  const t=ev.target,dd=t.dataset;
+  if(dd.vf){ui.vf[dd.vf]=t.value;return}
+  if(dd.vfd){ui.vf.docs[dd.vfd]=t.value;return}
+  const d=PD();if(!d)return;
+  if(dd.pd){d[dd.pd]=t.value;if(dd.pd==='cedula'){const c=COND(t.value.trim());if(c){d.nombre=c.nombre;save();keep();const n=$('#pd-ced');n.focus();n.setSelectionRange(t.value.length,t.value.length);return}}}
+  else if(dd.pobs)d.obsItems[dd.pobs]=t.value;
+  else if(dd.pe){VEH(d.placa).docs[dd.pe]=t.value}
+  else return;save();
+});
+document.addEventListener('change',ev=>{
+  const t=ev.target;
+  if(t.id==='pd-foto'&&t.files[0])resizePhoto(t.files[0],u=>{PD().foto=u;save();keep();toast('Foto agregada')});
+  if(t.dataset.pe)keep();
+});
+if(ui.view==='home')render();
+</script>
+
+<script src="sync.js"></script>
+<script>if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js'));</script>
+</body>
+</html>
