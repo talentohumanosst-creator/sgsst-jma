@@ -31,8 +31,12 @@
     const out = [];
     S.permits.filter(p => p.status !== 'borrador' && !p.ejemplo).forEach(p => out.push({ key: p.tipo + ':' + p.id, t: p.tipo, id: p.id, data: p,
       nombre: (p.tipo === 'ats' ? (p.gen.actividad || '') : (p.gen.area || '')).slice(0, 60), doc: () => { ui.pid = p.id; return vDoc(); } }));
-    (S.insps || []).filter(i => !i.ejemplo && !i.remoto && !i.borrador).forEach(i => out.push({ key: 'insp:' + i.id, t: 'insp', id: i.id, data: i,
-      nombre: i.code + ' ' + i.fecha, doc: () => { ui.insp = i.id; return vInspDoc(); } }));
+    (S.insps || []).filter(i => !i.ejemplo && !i.remoto && !i.borrador).forEach(i => {
+      const eq = EQ(i.code), tp = TIPOS[(eq && eq.tipo) || i.tipoEq] || {}, t = (FMT[tp.fmt || '057'] || FMT['057']).sync;
+      out.push({ key: t + ':' + i.id, t, id: i.id, data: i, nombre: i.code + ' ' + i.fecha, doc: () => { ui.insp = i.id; return vInspDoc(); } });
+    });
+    (S.epps || []).filter(p => p.status === 'cerrado' && !p.ejemplo).forEach(p => out.push({ key: 'epp:' + p.id, t: 'epp', id: p.id, data: p,
+      nombre: (p.sede || '').slice(0, 50) + ' ' + p.fecha, doc: () => { ui.epp = p.id; return vEppDoc(); } }));
     (S.preops || []).filter(x => !x.remoto).forEach(x => out.push({ key: 'preop:' + x.id, t: 'preop', id: x.id, data: x,
       nombre: x.placa + ' ' + x.fecha, doc: () => { ui.pre = x.id; return vPreDoc(); } }));
     (S.equipos || []).filter(e => !e.ejemplo).forEach(e => out.push({ key: 'equipo:' + e.code, t: 'equipo', id: e.code, data: e }));
@@ -91,7 +95,7 @@
     mergeBy(S.vehiculos, res.vehiculo, 'placa', 'vehiculo');
     (res.conductor || []).forEach(d => { const c = S.conductores.find(x => x.cedula === d.cedula); if (c) Object.assign(c, d); else S.conductores.push(d); S.sh['conductor:' + d.cedula] = H({ cedula: d.cedula, nombre: d.nombre, cat: d.cat, licVence: d.licVence }); });
     (res.firma || []).forEach(d => { if (d.img) { regSet(d.cedula, d.img); S.sh['firma:' + d.cedula] = H({ cedula: d.cedula, img: d.img }); } });
-    (res.insp || []).forEach(d => { if (!S.insps.find(x => x.id === d.id)) S.insps.push({ ...stripDrive(d), remoto: true }); });
+    [].concat(res.insp || [], res.insp_ext || [], res.insp_pa || []).forEach(d => { if (!S.insps.find(x => x.id === d.id)) S.insps.push({ ...stripDrive(d), remoto: true }); });
     (res.preop || []).forEach(d => { if (!S.preops.find(x => x.id === d.id)) S.preops.push({ ...stripDrive(d), remoto: true }); });
     S.lastPull = res.ahora; _save();
   }

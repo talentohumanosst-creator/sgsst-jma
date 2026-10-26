@@ -264,7 +264,22 @@ select.in{appearance:auto}
 .tri.cnc button[data-v="c"][aria-pressed="true"]{background:var(--verde);border-color:var(--verde);color:var(--negro)}
 .tri.cnc button[data-v="nc"][aria-pressed="true"]{background:var(--rojo);border-color:var(--rojo);color:var(--blanco)}
 .tri.cnc button[data-v="na"][aria-pressed="true"]{background:var(--gris-texto);border-color:var(--gris-texto);color:var(--blanco)}
-.item.v-c{border-left-color:var(--verde)}
+.item.v-c,.item.v-b{border-left-color:var(--verde)}
+.item.v-r{border-left-color:var(--amarillo);background:var(--tinte-amarillo)}
+.item.v-m{border-left-color:var(--rojo);background:var(--tinte-rosa)}
+.tri.quad{grid-template-columns:repeat(4,1fr)}
+.tri.duo{grid-template-columns:repeat(2,1fr)}
+.tri.cnc button[data-v="b"][aria-pressed="true"],.tri.cnc button[data-v="si"][aria-pressed="true"]{background:var(--verde);border-color:var(--verde);color:var(--negro)}
+.tri.cnc button[data-v="r"][aria-pressed="true"]{background:var(--amarillo);border-color:var(--amarillo);color:var(--negro)}
+.tri.cnc button[data-v="m"][aria-pressed="true"],.tri.cnc button[data-v="no"][aria-pressed="true"]{background:var(--rojo);border-color:var(--rojo);color:var(--blanco)}
+.pill.repo{background:var(--amarillo);color:var(--negro)}
+.botrow{display:grid;grid-template-columns:1fr;gap:8px;border-top:1px solid var(--line);padding-top:10px}
+.botrow:first-of-type{border-top:0;padding-top:0}
+.botrow .bh{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.botrow .bf{display:grid;grid-template-columns:90px 1fr 1fr;gap:8px;align-items:end}
+@media (max-width:480px){.botrow .bf{grid-template-columns:80px 1fr}.botrow .bf .fv{grid-column:1/-1}}
+.botrow .bf .in{min-height:44px}
+.seg.sm button{min-height:44px;font-size:14px}
 .item.v-nc{border-left-color:var(--rojo);background:var(--tinte-rosa)}
 @media (prefers-reduced-motion:no-preference){.item,.btn,.tri button,.chip,.day{transition:background-color .15s,border-color .15s}}
 </style>
@@ -469,6 +484,7 @@ function vHome(){
       ${typeof homeV==='function'?homeV():''}
       <div class="row" style="justify-content:space-between;background:var(--surface-2);border-radius:var(--radius-md);padding:12px 14px"><span style="font-size:14px">${regGet(S.user&&S.user.cedula)?'Tu firma está registrada':'Registra tu firma una vez y firma con un toque'}</span><button class="btn small" data-act="myfirma">${regGet(S.user&&S.user.cedula)?'Cambiar mi firma':'Registrar mi firma'}</button></div>
       ${typeof homeQ==='function'?homeQ():''}
+      ${typeof homeE==='function'?homeE():''}
       <div class="modules">
         ${[['Inspección de EPP','FT-SST-061'],['Inspección de extintores','FT-SST-060'],['Espacios confinados','FT-SST-115'],['Trabajo en caliente','FT-SST-111']].map(m=>`<div class="mod"><b>${m[0]}</b><span class="code">${m[1]} · próximamente</span></div>`).join('')}
       </div>
@@ -825,7 +841,9 @@ document.addEventListener('change',e=>{
   if(t.id==='g-altura'||t.id==='a-ini'){if(t.id==='a-ini'&&p.gen.inicio){p.gen.fin=addDays(p.gen.inicio,6);save()}keep()}
   if(t.id==='g-foto'&&t.files[0]){const fr=new FileReader();fr.onload=()=>{const img=new Image();img.onload=()=>{const c=document.createElement('canvas'),k=Math.min(1,1000/img.width);c.width=img.width*k;c.height=img.height*k;c.getContext('2d').drawImage(img,0,0,c.width,c.height);p.gen.foto=c.toDataURL('image/jpeg',.7);save();keep();toast('Foto agregada')};img.src=fr.result};fr.readAsDataURL(t.files[0])}
 });
-document.addEventListener('change',e=>{if(/^(fc-|wc-|aw-c-|iq-ic|iq-uc|pd-ced)/.test(e.target.id))keep()});
+/* redibuja sin perder el campo al que pasó la persona */
+function keepFocus(){setTimeout(()=>{const a=document.activeElement,id=a&&a.id,pos=a&&a.selectionStart;keep();if(id){const el=document.getElementById(id);if(el){el.focus();try{if(pos!=null)el.setSelectionRange(pos,pos)}catch(e){}}}},0)}
+document.addEventListener('change',e=>{if(/^(fc-|wc-|aw-c-|iq-ic|iq-uc|pd-ced)/.test(e.target.id)&&regGet(e.target.value))keepFocus()});
 async function sha256(t){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
 document.addEventListener('submit',async e=>{
   if(e.target.id!=='loginf')return;e.preventDefault();
@@ -843,8 +861,33 @@ render();
 <script>
 /* =================== Módulo: inspección de equipos con QR · FT-SST-057 =================== */
 const APP_URL=PROD?location.origin+location.pathname:'https://claude.ai/artifact/JsjixhiH4YhN6nnF9qjBii';
-const CATS={alturas:'Equipos de alturas',electricas:'Herramientas eléctricas',manuales:'Herramientas manuales'};
-const FREQ={alturas:30,electricas:30,manuales:90};
+const CATS={alturas:'Equipos de alturas',electricas:'Herramientas eléctricas',manuales:'Herramientas manuales',emergencia:'Extintores, botiquines y camillas'};
+const CAT_S={alturas:'Alturas',electricas:'Eléctricas',manuales:'Manuales',emergencia:'Emergencias'};
+const FREQ={alturas:30,electricas:30,manuales:90,emergencia:30};
+/* formatos oficiales por tipo de inspección (listado maestro FT-SST-032) */
+const FMT={
+  '057':{code:'FT-SST-057',title:'FORMATO INSPECCIÓN DE HERRAMIENTAS Y EQUIPOS',dir:'E4.2.4 Inspecciones / FT-SST-057',sync:'insp'},
+  '060':{code:'FT-SST-060',title:'FORMATO INSPECCIÓN Y CONTROL DE EXTINTORES',dir:'E4.2.4 Inspecciones / FT-SST-060',sync:'insp_ext'},
+  '059':{code:'FT-SST-059',title:'FORMATO INSPECCIÓN Y CONTROL DE BOTIQUINES Y ELEMENTOS DE PRIMEROS AUXILIOS',dir:'E4.2.4 Inspecciones / FT-SST-059',sync:'insp_pa'}};
+/* escalas de calificación: la del formato de herramientas (C/NC/NA), la de extintores y botiquines (B/R/M) y la de camillas (SÍ/NO) */
+const SC={
+  cnc:{opts:[['c','C'],['nc','NC'],['na','N/A']],bad:['nc'],warn:[],legend:'C: Cumple · NC: No cumple · N/A: No aplica',ok:'c'},
+  brm:{opts:[['b','B'],['r','R'],['m','M'],['na','N/A']],bad:['m'],warn:['r'],legend:'B: Bueno · R: Regular · M: Malo · N/A: No aplica',ok:'b'},
+  sino:{opts:[['si','SÍ'],['no','NO']],bad:['no'],warn:[],legend:'SÍ: cumple · NO: no cumple',ok:'si'}};
+const tpOf=e=>TIPOS[e.tipo];
+const fmtOf=tp=>FMT[tp.fmt||'057'];
+const scOf=tp=>SC[tp.scale||'cnc'];
+const CLASES_EXT=['ABC (multipropósito)','CO2','Agua a presión','Solkaflam / agente limpio','Clase K','Otro'];
+/* contenido del botiquín según el formato de inspección de J.M.A: [elemento, cantidad mínima, unidad, ¿tiene vencimiento?] */
+const BOT_TPL=[
+ ['Material de curación',[['Esparadrapo',1,'rollo',1],['Gasa',1,'paquete',1],['Gasa precortada',4,'paquete',1],['Curas',4,'caja x 10',1],['Micropore',1,'rollo',0],['Apósitos',1,'unidad',1],['Compresa',1,'unidad',1],['Parche oclusor',1,'unidad',1],['Vendas en rollo (diferentes anchos)',12,'rollo',1],['Baja lenguas',2,'paquete',1],['Aplicadores (copitos)',1,'paquete',1]]],
+ ['Instrumental y otros elementos',[['Guantes de látex',1,'caja x 100',1],['Termómetro',1,'unidad',0],['Camilla',1,'unidad',0],['Inmovilizadores de extremidades',1,'kit',0],['Inmovilizador cervical',1,'unidad',0],['Pitos',1,'unidad',0],['Linterna con pilas',1,'unidad',0],['Maletín portátil',1,'unidad',0],['Tijeras',1,'unidad',0],['Tapabocas',4,'unidad',0],['Bolsas plásticas para desechos',1,'paquete',0],['Termómetro digital (solo botiquín del profesional SST)',1,'unidad',0]]],
+ ['Antisépticos',[['Isodine',1,'tarro',1],['Solución salina',1,'bolsa',1]]],
+ ['Desinfección de instrumentos',[['Alcohol',1,'tarro',1]]],
+ ['Dotación brigadistas (c/u)',[['Chaleco',1,'unidad',0],['Libreta con esfero',1,'unidad',0],['Pito',1,'unidad',0],['Maletín canguro',1,'unidad',0]]],
+ ['Medicamentos (avalados solo en zonas remotas)',[['Acetaminofén',80,'sello x 10',1],['Sulfaplata',1,'tarro',1]]]];
+function botContenido(){const out=[];BOT_TPL.forEach(([sec,its],si)=>its.forEach(([n,min,u,v],i)=>out.push({id:'b'+si+'_'+i,sec,n,min,u,venc:!!v,cant:'',estado:'',fecha:''})));return out}
+function botFlags(it){const t=today(),f=[];if(it.cant!==''&&+it.cant<+it.min)f.push({k:'venc',l:+it.cant===0?'Faltante':'Incompleto'});if(it.venc&&it.fecha){if(it.fecha<t)f.push({k:'venc',l:'Vencido'});else if(it.fecha<=addDays(t,30))f.push({k:'prox',l:'Vence '+it.fecha})}if(it.estado==='m')f.push({k:'venc',l:'Malo'});return f}
 const ALT_BASE=['El equipo NO ha detenido una caída','Etiqueta legible (marca, serial, fecha de fabricación y norma)','Está dentro de la vida útil indicada por el fabricante'];
 const ELE_BASE=['Cable de alimentación sin cortes, aplastamientos ni empalmes','Clavija con polo a tierra completa y en buen estado','Interruptor funciona y no se queda trabado','Carcasa sin fisuras ni piezas sueltas','No presenta calentamiento, chispas ni ruidos anormales'];
 const MAN_BASE=['Mango firme, sin astillas, fisuras ni reparaciones con cinta o alambre','Cabeza o parte de trabajo bien ajustada al mango','Parte de trabajo sin desgaste, rebabas ni deformación','Sin oxidación excesiva','Herramienta original, no hechiza ni modificada'];
@@ -855,6 +898,10 @@ const TIPOS={
   CON:{cat:'alturas',n:'Conector / mosquetón',items:[...ALT_BASE,'Cuerpo sin fisuras, deformaciones ni bordes cortantes','La compuerta cierra sola y queda alineada','El seguro (rosca o automático) funciona','Sin óxido ni corrosión','Marcación de resistencia legible (kN)']},
   LDV:{cat:'alturas',n:'Línea de vida portátil',items:[...ALT_BASE,'Cuerda o cable sin cortes, aplastamientos, nudos, moho ni rigidez','Terminales, guardacabos y costuras en buen estado','Tensor y conectores funcionan']},
   ARR:{cat:'alturas',n:'Arrestador de caídas',items:[...ALT_BASE,'El mecanismo bloquea al halarlo','Sin óxido, golpes ni deformación','Compatible con el diámetro de la cuerda o cable','Pasador o seguro funciona']},
+  CUE:{cat:'alturas',n:'Cuerda de trabajo',items:[...ALT_BASE,'Cuerda sin cortes, quemaduras, aplastamientos ni zonas rígidas','Camisa (forro) sin desgaste que deje ver el alma','Sin contacto con químicos, pintura ni moho','Terminales y costuras en buen estado','Longitud marcada y legible']},
+  PUN:{cat:'alturas',n:'Puño bloqueador (ascensor)',items:[...ALT_BASE,'Cuerpo sin fisuras, deformaciones ni desgaste excesivo','La leva muerde la cuerda y no resbala','Gatillo o seguro funciona','Sin óxido ni corrosión']},
+  POL:{cat:'alturas',n:'Polea',items:[...ALT_BASE,'La roldana gira libre y sin desgaste','Placas laterales sin deformación','Eje y remaches firmes','Sin óxido ni corrosión']},
+  DES:{cat:'alturas',n:'Descendedor',items:[...ALT_BASE,'Superficies de fricción sin desgaste ni ranuras','Manija o leva antipánico funciona','Cuerpo sin fisuras ni deformaciones','Sin óxido ni corrosión']},
   ANC:{cat:'alturas',n:'Anclaje portátil (tie-off)',items:[...ALT_BASE,'Cinta o cable sin cortes, nudos, desgaste ni moho','Argollas sin deformación ni óxido','Resistencia marcada legible (mínimo 5.000 lb)']},
   PUL:{cat:'electricas',n:'Pulidora',items:[...ELE_BASE,'Guarda de protección instalada y ajustada','Disco adecuado para el material y las RPM, sin fisuras','Mango auxiliar instalado']},
   TAL:{cat:'electricas',n:'Taladro',items:[...ELE_BASE,'Broca adecuada y bien ajustada en el mandril','Mango auxiliar instalado']},
@@ -865,9 +912,12 @@ const TIPOS={
   PAL:{cat:'manuales',n:'Pala',items:MAN_BASE},
   BAR:{cat:'manuales',n:'Barra',items:['Sin fisuras, dobleces ni deformación','Puntas sin rebabas ni desgaste excesivo','Sin oxidación excesiva']},
   LLA:{cat:'manuales',n:'Llaves / alicates / destornilladores',items:MAN_BASE},
-  CAR:{cat:'manuales',n:'Carretilla',items:['Llanta inflada y sin daños','Estructura sin fisuras ni soldaduras rotas','Manijas firmes y con agarre','Platón sin perforaciones']}
+  CAR:{cat:'manuales',n:'Carretilla',items:['Llanta inflada y sin daños','Estructura sin fisuras ni soldaduras rotas','Manijas firmes y con agarre','Platón sin perforaciones']},
+  EXI:{cat:'emergencia',n:'Extintor',fmt:'060',scale:'brm',items:['Pintura','Señalización (aviso y demarcación)','Acceso libre de obstáculos','Visibilidad','Manómetro legible','Presión en rango (zona verde)','Pasador y precinto de seguridad','Manguera','Boquilla','Envase o cilindro sin golpes','Tarjeta de control','Manija','Sin corrosión']},
+  CAM:{cat:'emergencia',n:'Camilla',fmt:'059',scale:'sino',general:true,items:['¿Se encuentra visible?','¿Es de fácil acceso?','¿Está libre de elementos que la obstruyan?','¿Se encuentra señalizada?','¿El soporte se encuentra en buenas condiciones?','¿Cuenta con correas de seguridad?','¿Cuenta con sujetadores para agarre?','¿Cuenta con inmovilizador inferior?','¿Cuenta con inmovilizador superior?']},
+  BOT:{cat:'emergencia',n:'Botiquín de primeros auxilios',fmt:'059',scale:'brm',kind:'bot',items:[]}
 };
-const RES={apto:'Apto',fuera:'Fuera de servicio',baja:'Dado de baja'};
+const RES={apto:'Apto',fuera:'Fuera de servicio',baja:'Dado de baja',repo:'Requiere reposición'};
 
 /* --- datos de ejemplo (relativos a hoy) --- */
 function seedEq(){
@@ -888,6 +938,20 @@ function seedEq(){
 }
 if(!S.equipos){const s=PROD?{E:[],I:[]}:seedEq();S.equipos=s.E;S.insps=s.I;save()}
 S.insps=S.insps||[];
+if(!PROD&&!S.seedCert){S.equipos.forEach(e=>{if(e.ejemplo&&TIPOS[e.tipo].cat==='alturas'&&!e.certProxima){e.certUltima=addDays(today(),-200);e.certProxima=addDays(today(),165)}});S.seedCert=true}
+if(!PROD&&!S.seedEmerg){const t=today(),d=n=>addDays(t,n);
+  const bot=botContenido();bot.forEach(it=>{it.cant=it.min;it.estado='b';if(it.venc)it.fecha=d(200)});
+  const g=bot.find(x=>x.n==='Gasa');g.cant=0;const sl=bot.find(x=>x.n==='Solución salina');sl.fecha=d(12);const ac=bot.find(x=>x.n==='Acetaminofén');ac.fecha=d(-20);
+  S.equipos.push(
+    {code:'JMA-EXI-001',tipo:'EXI',nombre:'Extintor ABC 10 lb',marca:'Kidde',modelo:'',serial:'',fabricacion:'',servicio:d(-300),vence:'',capacidad:'10 lb',clase:'ABC (multipropósito)',recarga:d(-240),proxRecarga:d(125),obra:'Archivo, pasillo',responsable:'Brigada',frecuencia:30,foto:'',estado:'apto',ejemplo:true,creado:d(-300)},
+    {code:'JMA-EXI-002',tipo:'EXI',nombre:'Extintor CO2 7,5 lb',marca:'Badger',modelo:'',serial:'',fabricacion:'',servicio:d(-900),vence:'',capacidad:'7,5 lb',clase:'CO2',recarga:d(-350),proxRecarga:d(15),obra:'Oficina',responsable:'Brigada',frecuencia:30,foto:'',estado:'apto',ejemplo:true,creado:d(-900)},
+    {code:'JMA-BOT-001',tipo:'BOT',nombre:'Botiquín pasillo de oficinas',marca:'',modelo:'',serial:'',fabricacion:'',servicio:d(-400),vence:'',obra:'Pasillo de oficinas',responsable:'Samuel Restrepo',frecuencia:30,foto:'',estado:'repo',contenido:bot,ejemplo:true,creado:d(-400)},
+    {code:'JMA-CAM-001',tipo:'CAM',nombre:'Camilla rígida',marca:'',modelo:'',serial:'',fabricacion:'',servicio:d(-400),vence:'',obra:'Bodega',responsable:'Brigada',frecuencia:30,foto:'',estado:'apto',ejemplo:true,creado:d(-400)});
+  const chk=(n,v)=>{const c={};for(let i=0;i<n;i++)c[i]={v};return c};
+  S.insps.push({id:'ie1',code:'JMA-EXI-001',fecha:d(-20),hora:'08:00',tipo:'periodica',obra:'Archivo, pasillo',checks:chk(13,'b'),foto:'',resultado:'apto',accion:'',obs:'',inspector:{nombre:'Coordinador SST',cedula:'',img:''},usuario:{nombre:'',cedula:'',img:''},ejemplo:true},
+    {id:'ie2',code:'JMA-CAM-001',fecha:d(-10),hora:'08:20',tipo:'periodica',obra:'Bodega',checks:chk(9,'si'),general:'b',foto:'',resultado:'apto',accion:'',obs:'',inspector:{nombre:'Coordinador SST',cedula:'',img:''},usuario:{nombre:'',cedula:'',img:''},ejemplo:true},
+    {id:'ie3',code:'JMA-BOT-001',fecha:d(-6),hora:'08:40',tipo:'periodica',obra:'Pasillo de oficinas',checks:{},bot:JSON.parse(JSON.stringify(bot)),foto:'',resultado:'repo',accion:'',obs:'Falta gasa; acetaminofén vencido',inspector:{nombre:'Coordinador SST',cedula:'',img:''},usuario:{nombre:'',cedula:'',img:''},ejemplo:true});
+  S.seedEmerg=true;save()}
 
 /* --- descargas: en el prototipo usa el permiso del visor; en la app instalada, descarga normal del navegador --- */
 async function getDL(){if(!PROD)return await window.claude?.use?.('downloads');return{save:async({filename,data})=>{const bl=data instanceof Blob?data:new Blob([data]);const a=document.createElement('a');a.href=URL.createObjectURL(bl);a.download=filename;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},2000);return{status:'saved'}}}}
@@ -896,16 +960,23 @@ const EQ=code=>S.equipos.find(e=>e.code===code);
 const lastInsp=code=>S.insps.filter(i=>i.code===code&&!i.borrador).sort((a,b)=>(b.fecha+b.hora).localeCompare(a.fecha+a.hora))[0];
 function nextDue(e){const l=lastInsp(e.code);return l?addDays(l.fecha,+e.frecuencia||30):null}
 function dueState(e){if(e.estado==='baja')return null;const n=nextDue(e),t=today();if(!n)return{k:'venc',l:'Sin inspección'};if(n<t)return{k:'venc',l:'Vencida desde '+n};if(n<=addDays(t,7))return{k:'prox',l:'Vence '+n};return null}
-function lifeState(e){if(!e.vence||e.estado==='baja')return null;const t=today();if(e.vence<t)return{k:'venc',l:'Vida útil vencida'};if(e.vence<=addDays(t,90))return{k:'prox',l:'Vida útil vence '+e.vence};return null}
+function certState(e){if(e.estado==='baja'||TIPOS[e.tipo].cat!=='alturas')return null;const t=today();
+  if(!e.certProxima)return{k:'venc',l:'Sin inspección certificada registrada'};if(e.certProxima<t)return{k:'venc',l:'Inspección certificada vencida desde '+e.certProxima};if(e.certProxima<=addDays(t,30))return{k:'prox',l:'Inspección certificada vence '+e.certProxima};return null}
+function addYears(s,n){const d=new Date(s+'T12:00');d.setFullYear(d.getFullYear()+n);return iso(d)}
+function lifeState(e){const c=certState(e),v=lifeState0(e);if(c&&v)return{k:c.k==='venc'||v.k==='venc'?'venc':'prox',l:c.l+' · '+v.l};return c||v}
+function lifeState0(e){if(e.estado==='baja')return null;const t=today();
+  if(e.tipo==='EXI'){if(!e.proxRecarga)return{k:'venc',l:'Sin fecha de recarga'};if(e.proxRecarga<t)return{k:'venc',l:'Recarga vencida desde '+e.proxRecarga};if(e.proxRecarga<=addDays(t,30))return{k:'prox',l:'Recarga vence '+e.proxRecarga};return null}
+  if(e.tipo==='BOT'){const fl=(e.contenido||[]).map(it=>[it,botFlags(it)]).filter(([,f])=>f.length);if(!fl.length)return null;const bad=fl.filter(([,f])=>f.some(x=>x.k==='venc'));return bad.length?{k:'venc',l:bad.length+' elemento(s) vencidos o faltantes'}:{k:'prox',l:fl.length+' elemento(s) por vencer'}}
+  if(!e.vence)return null;if(e.vence<t)return{k:'venc',l:'Vida útil vencida'};if(e.vence<=addDays(t,90))return{k:'prox',l:'Vida útil vence '+e.vence};return null}
 function nextCode(tipo){const n=S.equipos.filter(e=>e.tipo===tipo).length+1;let c;let i=n;do{c=`JMA-${tipo}-${String(i).padStart(3,'0')}`;i++}while(EQ(c));return c}
 const eqThumb=e=>e.foto?`<img class="thumb" src="${e.foto}" alt="">`:`<span class="thumb">${e.tipo}</span>`;
 function resizePhoto(file,cb){const fr=new FileReader();fr.onload=()=>{const img=new Image();img.onload=()=>{const c=document.createElement('canvas'),k=Math.min(1,900/img.width);c.width=img.width*k;c.height=img.height*k;c.getContext('2d').drawImage(img,0,0,c.width,c.height);cb(c.toDataURL('image/jpeg',.7))};img.src=fr.result};fr.readAsDataURL(file)}
 
 /* --- inicio --- */
 function homeQ(){
-  const att=S.equipos.filter(e=>dueState(e)||e.estado==='fuera').length;
+  const att=S.equipos.filter(e=>dueState(e)||lifeState(e)||e.estado==='fuera'||e.estado==='repo').length;
   return `<div class="newgrid">
-    <button class="newcard" data-q="equipos"><span class="plus" style="background:var(--verde);color:var(--negro)">✓</span><span><b>Inspección de equipos con QR</b><span class="code">FT-SST-057 · ${S.equipos.filter(e=>e.estado!=='baja').length} equipos activos</span></span></button>
+    <button class="newcard" data-q="equipos"><span class="plus" style="background:var(--verde);color:var(--negro)">✓</span><span><b>Inspecciones con QR</b><span class="code">Equipos, herramientas, extintores, botiquines y camillas · ${S.equipos.filter(e=>e.estado!=='baja').length} activos</span></span></button>
     <button class="newcard" data-q="tablero"><span class="plus" style="background:var(--amarillo);color:var(--negro)">${att}</span><span><b>Tablero de seguimiento</b><span class="code">${att} equipo(s) requieren atención</span></span></button>
   </div>`;
 }
@@ -917,6 +988,7 @@ function renderQ(v,app,bar,bi){
   else if(v==='eqform'){app.innerHTML=vEqForm();bar.hidden=false;bi.innerHTML=`<button class="btn" data-q="${ui.eqf.isNew?'equipos':'equipo'}">Cancelar</button><button class="btn primary" data-q="eqsave">Guardar equipo</button>`}
   else if(v==='insp'){app.innerHTML=vInsp();bar.hidden=false;const last=ui.step===3;bi.innerHTML=`${ui.step===0?'<button class="btn" data-q="equipo">Cancelar</button>':'<button class="btn" data-q="iprev">Atrás</button>'}${last?`<button class="btn primary" data-q="isave" ${inspIssues().length?'disabled':''}>Guardar inspección</button>`:'<button class="btn primary" data-q="inext">Siguiente</button>'}`}
   else if(v==='inspdoc'){app.innerHTML=vInspDoc();bar.hidden=false;bi.innerHTML=`<button class="btn" data-q="equipo">Hoja de vida</button><button class="btn primary" data-q="tablero">Tablero</button>`}
+  else if(v==='eqimport'){app.innerHTML=vImport();bar.hidden=false;const n=(ui.imp||[]).filter(x=>!x.err&&!x.dup).length;bi.innerHTML=`<button class="btn" data-q="equipos">Cancelar</button><button class="btn primary" data-q="impok" ${n?'':'disabled'}>Importar ${n} equipo(s)</button>`}
   else if(v==='tablero'){app.innerHTML=vTablero();bar.hidden=false;bi.innerHTML=`<button class="btn" data-act="home">Inicio</button><button class="btn primary" data-q="equipos">Ver equipos</button>`}
   else if(typeof renderV==='function')renderV(v,app,bar,bi);
 }
@@ -924,13 +996,14 @@ function renderQ(v,app,bar,bi){
 /* --- lista de equipos --- */
 function vEquipos(){
   const f=ui.eqfilter||'todos',q=(ui.eqq||'').toLowerCase();
-  const list=S.equipos.filter(e=>(f==='todos'||TIPOS[e.tipo].cat===f)&&(!q||(e.code+' '+e.nombre+' '+e.serial+' '+e.obra).toLowerCase().includes(q)));
-  return `<div class="stephead"><span class="eyebrow">Inventario · FT-SST-057</span><h1>Equipos y herramientas</h1></div>
+  const list=S.equipos.filter(e=>(f==='todos'||TIPOS[e.tipo].cat===f)&&(!q||(e.code+' '+e.nombre+' '+e.serial+' '+e.obra+' '+(e.codAnt||'')).toLowerCase().includes(q)));
+  return `<div class="stephead"><span class="eyebrow">Inventario con QR · FT-SST-057 · 059 · 060</span><h1>Equipos, extintores y botiquines</h1></div>
   <div class="stack">
     <div class="card" style="gap:12px"><h3>Escanear código QR</h3>
       <p class="muted" style="margin:0;font-size:14px">Toma una foto del código pegado en el equipo, o escribe el código.</p>
       <label class="btn primary" for="qrfile">Tomar foto del QR</label><input type="file" id="qrfile" accept="image/*" capture="environment" hidden>
-      <div class="search"><input class="in" id="eqq" placeholder="Buscar por código, nombre, serial u obra" value="${esc(ui.eqq||'')}"></div></div>
+      <div class="search"><input class="in" id="eqq" placeholder="Buscar por código, nombre, referencia u obra" value="${esc(ui.eqq||'')}"></div>
+      <label class="link" for="impfile" style="align-self:flex-start;cursor:pointer">Importar inventario desde archivo CSV</label><input type="file" id="impfile" accept=".csv,text/csv" hidden></div>
     <div class="chips">${[['todos','Todos'],...Object.entries(CATS)].map(([k,l])=>`<button class="chip" data-q="eqfilter" data-v="${k}" aria-pressed="${f===k}">${l}</button>`).join('')}</div>
     <div class="plist">${list.length?list.map(e=>{const d=dueState(e),l=lifeState(e);return `<button class="eqitem" data-q="open-eq" data-code="${e.code}">${eqThumb(e)}<div class="main"><span class="code">${e.code}</span><b>${esc(e.nombre||TIPOS[e.tipo].n)}</b><span style="font-size:13px;color:var(--muted)">${esc(e.obra||'Sin obra asignada')}</span></div><div class="tags"><span class="pill ${e.estado}">${RES[e.estado]}</span>${d?`<span class="pill ${d.k}">${esc(d.l)}</span>`:''}${l?`<span class="pill ${l.k}">${esc(l.l)}</span>`:''}${e.ejemplo?'<span class="pill ej">Ejemplo</span>':''}</div></button>`}).join(''):'<p class="muted">No hay equipos con ese filtro. Registra el primero con el botón de abajo.</p>'}</div>
   </div>`;
@@ -946,11 +1019,23 @@ function vEquipo(){
     ${e.estado==='fuera'?'<p class="note" style="border-color:var(--amarillo)">Fuera de servicio: no se puede usar hasta repararlo y aprobar una nueva inspección.</p>':''}
     ${e.estado==='baja'?'<p class="note" style="border-color:var(--rojo)">Dado de baja: se retira de la obra y se inutiliza para que nadie lo vuelva a usar.</p>':''}
     <div class="card"><div class="hv">${e.foto?`<img class="ph" src="${e.foto}" alt="Foto del equipo">`:'<div class="ph">Sin foto de referencia</div>'}
-      <dl class="kv"><dt>Código</dt><dd class="code">${e.code}</dd><dt>Tipo</dt><dd>${tp.n}</dd><dt>Marca</dt><dd>${esc(e.marca||'—')}</dd><dt>Modelo</dt><dd>${esc(e.modelo||'—')}</dd><dt>Serial / lote</dt><dd>${esc(e.serial||'—')}</dd><dt>Fabricación</dt><dd>${esc(e.fabricacion||'—')}</dd><dt>En servicio desde</dt><dd>${esc(e.servicio||'—')}</dd><dt>Fin de vida útil</dt><dd>${esc(e.vence||'No aplica')}</dd><dt>Obra</dt><dd>${esc(e.obra||'—')}</dd><dt>Responsable</dt><dd>${esc(e.responsable||'—')}</dd><dt>Inspeccionar cada</dt><dd>${esc(e.frecuencia)} días</dd><dt>Próxima inspección</dt><dd>${n||'Ahora'}</dd></dl></div>
-      <button class="link" data-q="eqedit" style="align-self:flex-start">Editar datos del equipo</button></div>
+      <dl class="kv"><dt>Código</dt><dd class="code">${e.code}</dd><dt>Tipo</dt><dd>${tp.n}</dd>${hvRows(e)}<dt>${tp.cat==='emergencia'?'Ubicación':'Obra'}</dt><dd>${esc(e.obra||'—')}</dd><dt>Responsable</dt><dd>${esc(e.responsable||'—')}</dd><dt>Inspeccionar cada</dt><dd>${esc(e.frecuencia)} días</dd><dt>Próxima inspección</dt><dd>${n||'Ahora'}</dd></dl></div>
+      <button class="link" data-q="eqedit" style="align-self:flex-start">Editar datos</button></div>
+    ${e.tipo==='BOT'?botCard(e):''}
     <div class="card"><h3>Código QR del equipo</h3><div class="qrwrap"><div class="qrbox" id="qrbox"></div><div class="stack" style="gap:8px;flex:1;min-width:180px"><p class="muted" style="margin:0;font-size:14px">Pégalo en el equipo con una etiqueta resistente. Al escanearlo con la cámara del celular, se abre esta hoja de vida.</p><button class="btn small" data-q="label">Descargar etiqueta (PNG)</button></div></div></div>
     <div class="card"><h3>Historial de inspecciones</h3>${hist.length?`<div class="hist">${hist.map(i=>`<button data-q="open-insp" data-id="${i.id}"><span><b style="font-weight:500">${i.fecha}</b> · ${i.tipo==='preuso'?'Preuso':'Periódica'}<br><span class="muted" style="font-size:13px">${esc(i.inspector.nombre||'')}${i.obs?' · '+esc(i.obs):''}</span></span><span class="pill ${i.resultado}">${RES[i.resultado]}</span></button>`).join('')}</div>`:'<p class="muted" style="margin:0">Todavía no tiene inspecciones.</p>'}</div>
   </div>`;
+}
+function hvRows(e){
+  if(e.tipo==='EXI')return `<dt>Capacidad</dt><dd>${esc(e.capacidad||'—')}</dd><dt>Clase</dt><dd>${esc(e.clase||'—')}</dd><dt>Marca</dt><dd>${esc(e.marca||'—')}</dd><dt>Última recarga</dt><dd>${esc(e.recarga||'—')}</dd><dt>Próxima recarga</dt><dd>${esc(e.proxRecarga||'—')}</dd>`;
+  if(e.tipo==='BOT'||e.tipo==='CAM')return `<dt>Descripción</dt><dd>${esc(e.nombre||'—')}</dd>${e.marca?`<dt>Marca</dt><dd>${esc(e.marca)}</dd>`:''}`;
+  const alt=TIPOS[e.tipo].cat==='alturas';
+  return `${e.codAnt?`<dt>Código anterior</dt><dd>${esc(e.codAnt)}</dd>`:''}${+e.cantidad>1?`<dt>Cantidad</dt><dd>${esc(e.cantidad)} unidades</dd>`:''}<dt>Marca</dt><dd>${esc(e.marca||'—')}</dd><dt>Modelo</dt><dd>${esc(e.modelo||'—')}</dd><dt>Referencia / serial</dt><dd>${esc(e.serial||'—')}</dd>${e.condicion?`<dt>Condición</dt><dd>${esc(e.condicion)}</dd>`:''}<dt>Fabricación</dt><dd>${esc(e.fabricacion||'—')}</dd><dt>Fecha de adquisición</dt><dd>${esc(e.servicio||'—')}</dd>${alt?`<dt>Última inspección certificada</dt><dd>${esc(e.certUltima||'—')}</dd><dt>Próxima inspección certificada</dt><dd>${esc(e.certProxima||'Sin programar')}</dd>`:''}<dt>Fin de vida útil</dt><dd>${esc(e.vence||'No aplica')}</dd>`;
+}
+function botCard(e){
+  const its=e.contenido||[],fl=its.map(it=>[it,botFlags(it)]).filter(([,f])=>f.length);
+  return `<div class="card"><h3>Contenido del botiquín</h3><p class="muted" style="margin:0;font-size:14px">${its.length} elementos. Las cantidades y vencimientos se actualizan en cada inspección.</p>
+    ${fl.length?`<div class="hist">${fl.map(([it,f])=>`<div style="display:flex;justify-content:space-between;gap:8px;background:var(--surface-2);border-radius:var(--radius-md);padding:10px 12px"><span>${esc(it.n)}<br><span class="muted" style="font-size:13px">${it.cant===''?'—':esc(it.cant)} de ${esc(it.min)} ${esc(it.u)}${it.fecha?' · vence '+esc(it.fecha):''}</span></span><span class="row" style="gap:4px;justify-content:flex-end">${f.map(x=>`<span class="pill ${x.k}">${esc(x.l)}</span>`).join('')}</span></div>`).join('')}</div>`:'<div class="okbox">Completo y sin vencimientos próximos.</div>'}</div>`;
 }
 function qrText(code){return APP_URL+'#'+code}
 function drawQR(){const b=document.getElementById('qrbox');if(!b)return;if(typeof QRCode==='undefined'){b.innerHTML='<span class="muted" style="font-size:12px">El QR necesita internet la primera vez</span>';return}b.innerHTML='';new QRCode(b,{text:qrText(ui.eq),width:260,height:260,correctLevel:QRCode.CorrectLevel.M})}
@@ -963,7 +1048,7 @@ async function downloadLabel(){
   x.drawImage(qc,90,140,520,520);
   x.fillStyle='#134680';x.font='700 56px Ubuntu, sans-serif';x.textAlign='center';x.fillText(e.code,W/2,730);
   x.fillStyle='#000';x.font='500 30px Ubuntu, sans-serif';x.fillText((e.nombre||TIPOS[e.tipo].n).slice(0,38),W/2,780);
-  x.fillStyle='#414141';x.font='400 24px Ubuntu, sans-serif';x.fillText('SG-SST · Inspección FT-SST-057 · Escanéame antes de usar',W/2,840);
+  x.fillStyle='#414141';x.font='400 24px Ubuntu, sans-serif';x.fillText('SG-SST · Inspección '+fmtOf(TIPOS[e.tipo]).code+' · Escanéame antes de usar',W/2,840);
   const blob=await new Promise(r=>c.toBlob(r,'image/png'));
   const dl=await getDL();
   if(!dl){toast('La descarga no está disponible en esta vista');return}
@@ -977,95 +1062,170 @@ function vEqForm(){
   <div class="card">
     <label class="f"><span class="req">Tipo de equipo</span><select class="in" id="ef-tipo" data-ef="tipo" ${f.isNew?'':'disabled'}><option value="">Elige…</option>${Object.entries(CATS).map(([ck,cl])=>`<optgroup label="${cl}">${Object.entries(TIPOS).filter(([,t])=>t.cat===ck).map(([k,t])=>`<option value="${k}" ${f.tipo===k?'selected':''}>${t.n}</option>`).join('')}</optgroup>`).join('')}</select></label>
     ${f.tipo?`<p class="decl">Código asignado: <b class="code" style="color:var(--azul)">${f.code}</b></p>`:''}
-    <label class="f">Descripción<input class="in" id="ef-nombre" data-ef="nombre" value="${esc(f.nombre)}" placeholder="Ej: Arnés multipropósito 4 argollas"></label>
-    <div class="grid2">
+    <label class="f">Descripción<input class="in" id="ef-nombre" data-ef="nombre" value="${esc(f.nombre)}" placeholder="${f.tipo==='EXI'?'Ej: Extintor ABC 10 lb':f.tipo==='BOT'?'Ej: Botiquín pasillo de oficinas':'Ej: Arnés multipropósito 4 argollas'}"></label>
+    ${f.tipo==='EXI'?`<div class="grid2">
+      <label class="f"><span class="req">Capacidad</span><input class="in" id="ef-cap" data-ef="capacidad" value="${esc(f.capacidad||'')}" placeholder="Ej: 10 lb"></label>
+      <label class="f"><span class="req">Clase</span><select class="in" id="ef-clase" data-ef="clase"><option value="">Elige…</option>${CLASES_EXT.map(c=>`<option ${f.clase===c?'selected':''}>${c}</option>`).join('')}</select></label>
+      <label class="f"><span class="req">Última recarga</span><input class="in" type="date" id="ef-rec" data-ef="recarga" value="${esc(f.recarga||'')}"></label>
+      <label class="f"><span class="req">Próxima recarga</span><input class="in" type="date" id="ef-prec" data-ef="proxRecarga" value="${esc(f.proxRecarga||'')}"></label>
+      <label class="f">Marca<input class="in" id="ef-marca" data-ef="marca" value="${esc(f.marca)}"></label>
+      <label class="f"><span class="req">Ubicación</span><input class="in" id="ef-obra" data-ef="obra" value="${esc(f.obra)}"></label>
+      <label class="f">Responsable<input class="in" id="ef-resp" data-ef="responsable" value="${esc(f.responsable)}"></label>
+      <label class="f"><span class="req">Inspeccionar cada (días)</span><input class="in" type="number" min="1" id="ef-freq" data-ef="frecuencia" value="${esc(f.frecuencia)}"></label></div>`
+    :f.tipo==='BOT'||f.tipo==='CAM'?`<div class="grid2">
+      <label class="f"><span class="req">Ubicación</span><input class="in" id="ef-obra" data-ef="obra" value="${esc(f.obra)}"></label>
+      <label class="f">Responsable<input class="in" id="ef-resp" data-ef="responsable" value="${esc(f.responsable)}"></label>
+      <label class="f">Marca o tipo<input class="in" id="ef-marca" data-ef="marca" value="${esc(f.marca)}" placeholder="${f.tipo==='CAM'?'Rígida, plegable…':'Portátil, de pared…'}"></label>
+      <label class="f"><span class="req">Inspeccionar cada (días)</span><input class="in" type="number" min="1" id="ef-freq" data-ef="frecuencia" value="${esc(f.frecuencia)}"></label></div>
+      ${f.tipo==='BOT'?'<p class="decl">El contenido del botiquín (cantidades mínimas, unidades y vencimientos) viene del formato de J.M.A. Las cantidades reales y las fechas se registran en la primera inspección.</p>':''}`
+    :`<div class="grid2">
       <label class="f">Marca<input class="in" id="ef-marca" data-ef="marca" value="${esc(f.marca)}"></label>
       <label class="f">Modelo<input class="in" id="ef-modelo" data-ef="modelo" value="${esc(f.modelo)}"></label>
-      <label class="f">Serial o lote<input class="in" id="ef-serial" data-ef="serial" value="${esc(f.serial)}"></label>
+      <label class="f">Referencia o serial<input class="in" id="ef-serial" data-ef="serial" value="${esc(f.serial)}"></label>
+      <label class="f">Condición<select class="in" id="ef-cond" data-ef="condicion"><option value="">—</option>${['Nuevo','Usado'].map(c=>`<option ${f.condicion===c?'selected':''}>${c}</option>`).join('')}</select></label>
       <label class="f">Fecha de fabricación<input class="in" type="date" id="ef-fab" data-ef="fabricacion" value="${esc(f.fabricacion)}"></label>
-      <label class="f">En servicio desde<input class="in" type="date" id="ef-serv" data-ef="servicio" value="${esc(f.servicio)}"></label>
+      <label class="f">Fecha de adquisición<input class="in" type="date" id="ef-serv" data-ef="servicio" value="${esc(f.servicio)}"></label>
+      ${f.tipo&&TIPOS[f.tipo].cat==='alturas'?`<label class="f">Última inspección certificada<input class="in" type="date" id="ef-cu" data-ef="certUltima" value="${esc(f.certUltima||'')}"></label>
+      <label class="f">Próxima inspección certificada<input class="in" type="date" id="ef-cp" data-ef="certProxima" value="${esc(f.certProxima||'')}"></label>
+      <label class="f">Cantidad<input class="in" type="number" min="1" id="ef-cant" data-ef="cantidad" value="${esc(f.cantidad||1)}"></label>
+      <label class="f">Código anterior (bodega)<input class="in" id="ef-ant" data-ef="codAnt" value="${esc(f.codAnt||'')}" placeholder="Ej: ARX001"></label>`:''}
       <label class="f">Fin de vida útil${f.tipo&&TIPOS[f.tipo].cat==='alturas'?' <span class="muted">(según fabricante)</span>':''}<input class="in" type="date" id="ef-vence" data-ef="vence" value="${esc(f.vence)}"></label>
       <label class="f">Obra o ubicación<input class="in" id="ef-obra" data-ef="obra" value="${esc(f.obra)}"></label>
       <label class="f">Responsable<input class="in" id="ef-resp" data-ef="responsable" value="${esc(f.responsable)}"></label>
       <label class="f"><span class="req">Inspeccionar cada (días)</span><input class="in" type="number" min="1" id="ef-freq" data-ef="frecuencia" value="${esc(f.frecuencia)}"></label>
-    </div>
-    <div class="f"><span>Foto de referencia del equipo</span><div class="photo">${f.foto?`<img src="${f.foto}" alt="">`:''}<label class="btn small" for="ef-foto">${f.foto?'Cambiar foto':'Tomar o subir foto'}</label><input id="ef-foto" type="file" accept="image/*" capture="environment" hidden></div></div>
+    </div>`}
+    <div class="f"><span>Foto de referencia</span><div class="photo">${f.foto?`<img src="${f.foto}" alt="">`:''}<label class="btn small" for="ef-foto">${f.foto?'Cambiar foto':'Tomar o subir foto'}</label><input id="ef-foto" type="file" accept="image/*" capture="environment" hidden></div></div>
   </div>`;
 }
 
 /* --- inspección (4 pasos) --- */
 const I_STEPS=['Datos de la inspección','Lista de chequeo','Foto y resultado','Firmas'];
+function resTitle(tp,r){if(r==='apto')return tp.kind==='bot'?'Botiquín completo':'Apto para usar';if(r==='repo')return 'Requiere reposición de elementos';if(tp.cat==='alturas')return 'No apto: se da de baja';return r==='baja'?'No apto: se da de baja':'No apto: sale de servicio'}
+function botResumen(d){const fl=(d.bot||[]).map(it=>[it,botFlags(it).filter(x=>x.k==='venc')]).filter(([,f])=>f.length);return 'Reponer: '+fl.map(([it,f])=>it.n+' ('+f.map(x=>x.l.toLowerCase()).join(', ')+')').join('; ')+'.'}
+function vBotCheck(d){
+  const secs=[...new Set(d.bot.map(it=>it.sec))];
+  return `<p class="muted" style="margin:0 0 12px;font-size:14px">Las cantidades y fechas vienen de la inspección anterior: corrige solo lo que cambió. Estado: B bueno · R regular · M malo.</p><div class="stack">${secs.map(sec=>{const its=d.bot.filter(it=>it.sec===sec);const done=its.every(it=>it.estado&&it.cant!=='');return `<div class="card" style="gap:10px"><div class="row" style="justify-content:space-between"><h3>${esc(sec)}</h3>${done?'<span class="pill apto">Revisado</span>':`<button class="btn small primary" data-q="botok" data-sec="${esc(sec)}">Todo completo y bueno</button>`}</div>
+    ${its.map(it=>{const f=botFlags(it);return `<div class="botrow"><div class="bh"><b style="font-weight:500">${esc(it.n)}</b><span class="row" style="gap:4px;justify-content:flex-end">${f.map(x=>`<span class="pill ${x.k}">${esc(x.l)}</span>`).join('')}</span></div>
+      <div class="bf"><label class="f">Cantidad<input class="in" type="number" min="0" inputmode="numeric" id="bc-${it.id}" data-bot="${it.id}" data-bf="cant" value="${esc(it.cant)}"><span class="muted" style="font-weight:400;font-size:12px">mín. ${esc(it.min)} ${esc(it.u)}</span></label>
+        <div class="f"><span>Estado</span><div class="seg sm">${[['b','B'],['r','R'],['m','M']].map(([k,l])=>`<button type="button" data-q="botest" data-id="${it.id}" data-v="${k}" aria-pressed="${it.estado===k}">${l}</button>`).join('')}</div></div>
+        ${it.venc?`<label class="f fv">Vence<input class="in" type="date" id="bf-${it.id}" data-bot="${it.id}" data-bf="fecha" value="${esc(it.fecha)}"></label>`:'<span class="muted fv" style="font-size:12px;align-self:center">Sin vencimiento</span>'}</div></div>`}).join('')}</div>`}).join('')}</div>`;
+}
 const D=()=>S.idraft;
-function inspResult(d){const tp=TIPOS[EQ(d.code).tipo];const nc=tp.items.some((_,i)=>(d.checks[i]||{}).v==='nc');if(!nc)return'apto';return tp.cat==='alturas'?'baja':(d.accion==='baja'?'baja':'fuera')}
+function inspResult(d){const tp=TIPOS[EQ(d.code).tipo],sc=scOf(tp);
+  if(tp.kind==='bot')return (d.bot||[]).some(it=>botFlags(it).some(x=>x.k==='venc'))?'repo':'apto';
+  const nc=tp.items.some((_,i)=>sc.bad.includes((d.checks[i]||{}).v))||(tp.general&&d.general==='m');if(!nc)return'apto';return tp.cat==='alturas'?'baja':(d.accion==='baja'?'baja':'fuera')}
 function vInsp(){
   const d=D(),e=EQ(d.code),tp=TIPOS[e.tipo],st=ui.step;let body='';
-  if(st===0)body=`<div class="card">
+  const emerg=tp.cat==='emergencia',sc=scOf(tp),fm=fmtOf(tp);
+  if(st===0&&emerg)body=`<div class="card">
+      <div class="grid2"><label class="f"><span class="req">Fecha</span><input class="in" type="date" id="iq-fecha" data-iq="fecha" value="${esc(d.fecha)}"></label><label class="f">Hora<input class="in" type="time" id="iq-hora" data-iq="hora" value="${esc(d.hora)}"></label></div>
+      <label class="f"><span class="req">Ubicación</span><input class="in" id="iq-obra" data-iq="obra" value="${esc(d.obra)}"></label>
+      ${d.obra&&d.obra!==e.obra?`<p class="decl">Cambió de ubicación (antes: ${esc(e.obra)}). Se registra como <b>re-ubicación</b> y el ${tp.n.toLowerCase()} conserva su código.</p>`:''}
+      ${e.tipo==='EXI'?`<div class="grid2"><label class="f"><span class="req">Última recarga</span><input class="in" type="date" id="iq-rec" data-iq="recarga" value="${esc(d.recarga||'')}"></label><label class="f"><span class="req">Próxima recarga</span><input class="in" type="date" id="iq-prec" data-iq="proxRecarga" value="${esc(d.proxRecarga||'')}"></label></div><p class="muted" style="margin:0;font-size:14px">Vienen de la hoja de vida. Cámbialas solo si el extintor se recargó.</p>`:''}
+    </div>`;
+  else if(st===0)body=`<div class="card">
       <div class="f"><span class="req">Tipo de inspección</span><div class="seg">${[['preuso','Preuso (diaria)'],['periodica','Periódica (SST)']].map(([k,l])=>`<button type="button" data-q="itipo" data-v="${k}" aria-pressed="${d.tipo===k}">${l}</button>`).join('')}</div></div>
       <div class="grid2"><label class="f"><span class="req">Fecha</span><input class="in" type="date" id="iq-fecha" data-iq="fecha" value="${esc(d.fecha)}"></label><label class="f">Hora<input class="in" type="time" id="iq-hora" data-iq="hora" value="${esc(d.hora)}"></label></div>
       <label class="f"><span class="req">Obra o área</span><input class="in" id="iq-obra" data-iq="obra" value="${esc(d.obra)}"></label>
       <div class="grid2"><label class="f">Trabajador que usa el equipo<input class="in" id="iq-un" data-iqu="nombre" value="${esc(d.usuario.nombre)}"></label><label class="f">Cédula del trabajador<input class="in" id="iq-uc" inputmode="numeric" data-iqu="cedula" value="${esc(d.usuario.cedula)}"></label></div>
-      ${tp.cat==='alturas'&&d.tipo==='periodica'?'<p class="decl">Equipos de alturas: la inspección periódica la hace una persona competente, como lo exige la Resolución 4272 de 2021.</p>':''}
+      ${tp.cat==='alturas'&&d.tipo==='periodica'?`<p class="decl">Equipos de alturas: la inspección periódica la hace una persona competente, como lo exige la Resolución 4272 de 2021.</p>
+      <div class="f"><span>¿Es la inspección anual certificada?</span><div class="seg">${[['si','Sí, anual certificada'],['no','No']].map(([k,l])=>`<button type="button" data-q="icert" data-v="${k}" aria-pressed="${(d.cert||'no')===k}">${l}</button>`).join('')}</div></div>
+      ${d.cert==='si'?`<div class="grid2"><label class="f"><span class="req">Persona o entidad competente</span><input class="in" id="iq-cent" data-iq="certEntidad" value="${esc(d.certEntidad||'')}"></label><label class="f">N.° de certificado<input class="in" id="iq-cnum" data-iq="certNumero" value="${esc(d.certNumero||'')}"></label></div><p class="muted" style="margin:0;font-size:14px">Al guardar, la próxima inspección certificada queda para el ${addYears(d.fecha||today(),1)}.</p>`:''}`:''}
     </div>`;
-  else if(st===1)body=`<div class="row" style="justify-content:space-between"><span class="muted" style="font-size:14px">C: Cumple · NC: No cumple · N/A: No aplica</span><button class="btn small" data-q="iallc">Pendientes en C</button></div>
-    <div class="items" style="margin-top:12px">${tp.items.map((t,i)=>{const c=d.checks[i]||{};return `<div class="item ${c.v?'v-'+c.v:''}"><p>${esc(t)}</p>
-      <div class="tri cnc">${[['c','C'],['nc','NC'],['na','N/A']].map(([v,l])=>`<button type="button" data-q="icheck" data-i="${i}" data-v="${v}" aria-pressed="${c.v===v}">${l}</button>`).join('')}</div>
-      ${c.v==='nc'?`<input class="in obs" id="iobs-${i}" data-iobs="${i}" placeholder="Describe el daño encontrado" value="${esc(c.obs||'')}">`:''}</div>`}).join('')}</div>`;
+  else if(st===1&&tp.kind==='bot')body=vBotCheck(d);
+  else if(st===1)body=`<div class="row" style="justify-content:space-between"><span class="muted" style="font-size:14px">${sc.legend}</span><button class="btn small" data-q="iallc">Pendientes en ${sc.opts[0][1]}</button></div>
+    <div class="items" style="margin-top:12px">${tp.items.map((t,i)=>{const c=d.checks[i]||{};const need=sc.bad.includes(c.v)||sc.warn.includes(c.v);return `<div class="item ${c.v?'v-'+c.v:''}"><p>${esc(t)}</p>
+      <div class="tri cnc ${sc.opts.length===4?'quad':sc.opts.length===2?'duo':''}">${sc.opts.map(([v,l])=>`<button type="button" data-q="icheck" data-i="${i}" data-v="${v}" aria-pressed="${c.v===v}">${l}</button>`).join('')}</div>
+      ${need?`<input class="in obs" id="iobs-${i}" data-iobs="${i}" placeholder="${sc.bad.includes(c.v)?'Describe el daño o la condición encontrada':'¿Qué se observa?'}" value="${esc(c.obs||'')}">`:''}</div>`}).join('')}</div>`;
   else if(st===2){const r=inspResult(d);
     body=`<div class="stack"><div class="card"><h3>Foto del equipo en esta inspección</h3><p class="muted" style="margin:0;font-size:14px">Obligatoria. Si hay un daño, enfoca el daño.</p>
       <div class="photo">${d.foto?`<img src="${d.foto}" alt="" style="width:160px;height:120px">`:''}<label class="btn ${d.foto?'small':'primary'}" for="iq-foto">${d.foto?'Cambiar foto':'Tomar foto'}</label><input id="iq-foto" type="file" accept="image/*" capture="environment" hidden></div></div>
-      <div class="result ${r==='apto'?'ok':'bad'}"><span class="eyebrow">Resultado</span><b>${r==='apto'?'Apto para usar':tp.cat==='alturas'?'No apto: se da de baja':'No apto: sale de servicio'}</b>
-        <span style="font-size:14px">${r==='apto'?'Todos los puntos cumplen o no aplican.':tp.cat==='alturas'?'Un equipo de protección contra caídas con daño o que detuvo una caída no se repara: se retira definitivamente.':'Elige qué se hace con el equipo:'}</span>
-        ${r!=='apto'&&tp.cat!=='alturas'?`<div class="seg" style="background:var(--blanco)">${[['mant','Enviar a mantenimiento'],['baja','Dar de baja']].map(([k,l])=>`<button type="button" data-q="iacc" data-v="${k}" aria-pressed="${(d.accion||'mant')===k}">${l}</button>`).join('')}</div>`:''}</div>
+      ${tp.general?`<div class="card"><div class="f"><span class="req">Estado general de la camilla</span><div class="seg">${[['b','Bueno'],['r','Regular'],['m','Malo']].map(([k,l])=>`<button type="button" data-q="igen" data-v="${k}" aria-pressed="${d.general===k}">${l}</button>`).join('')}</div></div></div>`:''}
+      <div class="result ${r==='apto'?'ok':'bad'}"><span class="eyebrow">Resultado</span><b>${resTitle(tp,r)}</b>
+        <span style="font-size:14px">${r==='apto'?(tp.kind==='bot'?'Completo y sin elementos vencidos.':'Todos los puntos están en buen estado o no aplican.'):tp.kind==='bot'?botResumen(d):tp.cat==='alturas'?'Un equipo de protección contra caídas con daño o que detuvo una caída no se repara: se retira definitivamente.':'Elige qué se hace:'}</span>
+        ${r!=='apto'&&tp.cat!=='alturas'&&tp.kind!=='bot'?`<div class="seg" style="background:var(--blanco)">${[['mant',tp.tipo==='EXI'||e.tipo==='EXI'?'Enviar a recarga o mantenimiento':'Enviar a mantenimiento'],['baja','Dar de baja']].map(([k,l])=>`<button type="button" data-q="iacc" data-v="${k}" aria-pressed="${(d.accion||'mant')===k}">${l}</button>`).join('')}</div>`:''}</div>
       <label class="f">Observaciones<textarea class="in" id="iq-obs" data-iq="obs">${esc(d.obs)}</textarea></label></div>`}
   else if(st===3){const iss=inspIssues();
     body=`<div class="stack">
-      <div class="card"><h3>Inspector${d.tipo==='periodica'?' (SST o persona competente)':''}</h3>
+      <div class="card"><h3>${emerg?'Profesional SST que inspecciona':'Inspector'+(d.tipo==='periodica'?' (SST o persona competente)':'')}</h3>
         <div class="grid2"><label class="f"><span class="req">Nombre</span><input class="in" id="iq-in" data-iqi="nombre" value="${esc(d.inspector.nombre)}"></label><label class="f"><span class="req">Cédula</span><input class="in" id="iq-ic" inputmode="numeric" data-iqi="cedula" value="${esc(d.inspector.cedula)}"></label></div>
         <button type="button" class="sigbox ${d.inspector.img?'has':''}" data-q="isign" data-who="inspector">${d.inspector.img?`<img src="${d.inspector.img}" alt="">`:'Toca para firmar'}</button></div>
-      ${d.usuario.nombre?`<div class="card"><h3>Trabajador: ${esc(d.usuario.nombre)}</h3><button type="button" class="sigbox ${d.usuario.img?'has':''}" data-q="isign" data-who="usuario">${d.usuario.img?`<img src="${d.usuario.img}" alt="">`:'Toca para firmar'}</button></div>`:''}
+      ${d.usuario.nombre&&!emerg?`<div class="card"><h3>Trabajador: ${esc(d.usuario.nombre)}</h3><button type="button" class="sigbox ${d.usuario.img?'has':''}" data-q="isign" data-who="usuario">${d.usuario.img?`<img src="${d.usuario.img}" alt="">`:'Toca para firmar'}</button></div>`:''}
       ${iss.length?`<div class="card"><h3>Falta resolver</h3>${iss.map(x=>`<button class="issue" data-q="igoto" data-step="${x.step}"><b>●</b><span>${esc(x.m)} <u>Ir al paso</u></span></button>`).join('')}</div>`:''}
     </div>`}
   return `<div class="stephead">
-    <div class="row" style="justify-content:space-between"><span class="eyebrow">Paso ${st+1} de 4 · <span class="code">FT-SST-057</span></span><span class="code" style="color:var(--azul)">${e.code}</span></div>
+    <div class="row" style="justify-content:space-between"><span class="eyebrow">Paso ${st+1} de 4 · <span class="code">${fm.code}</span></span><span class="code" style="color:var(--azul)">${e.code}</span></div>
     <div class="progress">${I_STEPS.map((_,i)=>`<i class="${i<st?'done':i===st?'cur':''}"></i>`).join('')}</div>
     <h1>${I_STEPS[st]}</h1><span class="muted">${esc(e.nombre||tp.n)}</span><span class="saved" id="savedat">${stamp()}</span></div>${body}`;
 }
 function inspIssues(){
-  const d=D(),tp=TIPOS[EQ(d.code).tipo],out=[];
+  const d=D(),e=EQ(d.code),tp=TIPOS[e.tipo],sc=scOf(tp),out=[];
   if(!d.tipo)out.push({step:0,m:'Elige el tipo de inspección.'});
-  if(!d.fecha||!d.obra)out.push({step:0,m:'Falta la fecha o la obra.'});
+  if(!d.fecha||!d.obra)out.push({step:0,m:'Falta la fecha o la '+(tp.cat==='emergencia'?'ubicación.':'obra.')});
+  if(d.cert==='si'&&!(d.certEntidad||'').trim())out.push({step:0,m:'Escribe quién hizo la inspección anual certificada.'});
+  if(e.tipo==='EXI'&&(!d.recarga||!d.proxRecarga))out.push({step:0,m:'Faltan las fechas de recarga del extintor.'});
+  if(tp.kind==='bot'){const p=d.bot.filter(it=>!it.estado||it.cant==='').length;if(p)out.push({step:1,m:`${p} elemento(s) del botiquín sin revisar.`});const nf=d.bot.filter(it=>it.venc&&+it.cant>0&&!it.fecha).length;if(nf)out.push({step:1,m:`${nf} elemento(s) sin fecha de vencimiento.`})}
   const empty=tp.items.filter((_,i)=>!(d.checks[i]||{}).v).length;if(empty)out.push({step:1,m:`${empty} punto(s) sin revisar.`});
-  tp.items.forEach((t,i)=>{const c=d.checks[i]||{};if(c.v==='nc'&&!(c.obs||'').trim())out.push({step:1,m:`Describe el daño en: "${t}".`})});
+  tp.items.forEach((t,i)=>{const c=d.checks[i]||{};if((sc.bad.includes(c.v)||sc.warn.includes(c.v))&&!(c.obs||'').trim())out.push({step:1,m:`Escribe la observación en: "${t}".`})});
+  if(tp.general&&!d.general)out.push({step:2,m:'Elige el estado general de la camilla.'});
   if(!d.foto)out.push({step:2,m:'Falta la foto del equipo.'});
   if(!d.inspector.nombre||!d.inspector.cedula||!d.inspector.img)out.push({step:3,m:'Falta nombre, cédula o firma del inspector.'});
   if(d.usuario.nombre&&!d.usuario.img)out.push({step:3,m:'Falta la firma del trabajador.'});
   return out;
 }
 function vInspDoc(){
-  const i=S.insps.find(x=>x.id===ui.insp),e=EQ(i.code),tp=TIPOS[e.tipo];
-  return `<div class="stack"><div class="stephead"><span class="eyebrow">Inspección ${i.tipo==='preuso'?'preuso':'periódica'} · ${i.fecha}</span><h1>Registro FT-SST-057</h1><div class="row"><span class="pill ${i.resultado}">${RES[i.resultado]}</span>${i.ejemplo?'<span class="pill ej">Ejemplo</span>':''}</div></div>
-  <p class="note">Así queda el PDF que se archiva en <span class="code">SG-SST JMA / E4.2.4 Inspecciones / FT-SST-057 / ${e.code}</span>.</p>
+  const i=S.insps.find(x=>x.id===ui.insp),e=EQ(i.code)||{code:i.code,tipo:i.tipoEq||'ARN'},tp=TIPOS[e.tipo],fm=fmtOf(tp),sc=scOf(tp),emerg=tp.cat==='emergencia';
+  let datos,lista;
+  if(e.tipo==='EXI'){datos=`<tr><td><b>N° extintor</b> ${e.code}</td><td><b>Capacidad</b> ${esc(e.capacidad)}</td><td><b>Clase</b> ${esc(e.clase)}</td><td><b>Ubicación</b> ${esc(i.obra)}${i.reubicado?' (re-ubicado)':''}</td></tr><tr><td colspan="2"><b>Última recarga</b> ${esc(i.recarga||e.recarga)}</td><td colspan="2"><b>Próxima recarga</b> ${esc(i.proxRecarga||e.proxRecarga)}</td></tr>`}
+  else if(emerg){datos=`<tr><td><b>Elemento</b> ${esc(e.nombre||tp.n)}</td><td><b>Código</b> ${e.code}</td><td colspan="2"><b>Ubicación</b> ${esc(i.obra)}${i.reubicado?' (re-ubicado)':''} · <b>Responsable</b> ${esc(e.responsable)}</td></tr>`}
+  else datos=(i.cert==='si'?`<tr><td colspan="4"><b>Inspección anual certificada</b> por ${esc(i.certEntidad)}${i.certNumero?' · certificado N.° '+esc(i.certNumero):''} · próxima: ${addYears(i.fecha,1)}</td></tr>`:'')+`<tr><td><b>Tipo</b> ${i.tipo==='preuso'?'Preuso':'Periódica'}</td><td><b>Equipo</b> ${tp.n}</td><td><b>Marca</b> ${esc(e.marca)}</td><td><b>Serial</b> ${esc(e.serial)} · <b>Vida útil</b> ${esc(e.vence||'N/A')}</td></tr><tr><td colspan="4"><b>Obra</b> ${esc(i.obra)}</td></tr>`;
+  if(tp.kind==='bot'){const secs=[...new Set((i.bot||[]).map(x=>x.sec))];lista=`<table class="sec"><tr><th>2. Elemento</th><th class="c">Cant.</th><th>Unidad (mín.)</th><th class="c">Estado</th><th>Vencimiento</th><th>Observación</th></tr>${secs.map(sec=>`<tr><td colspan="6" style="background:#eef1f5"><b>${esc(sec)}</b></td></tr>`+(i.bot||[]).filter(x=>x.sec===sec).map(x=>{const f=botFlags(x);return `<tr><td>${esc(x.n)}</td><td class="c ${+x.cant<+x.min?'no':''}">${esc(x.cant)}</td><td>${esc(x.u)} (${esc(x.min)})</td><td class="c ${x.estado==='m'?'no':''}">${(x.estado||'').toUpperCase()}</td><td>${x.venc?esc(x.fecha||'—'):'N/A'}</td><td class="${f.some(y=>y.k==='venc')?'no':''}">${f.map(y=>y.l).join(', ')||'Ninguna'}</td></tr>`}).join('')).join('')}</table>`}
+  else lista=`<table class="sec"><tr><th>2. Lista de chequeo</th>${sc.opts.map(([,l])=>`<th class="c">${l}</th>`).join('')}<th>Observación</th></tr>${tp.items.map((t,k)=>{const c=i.checks[k]||{};return `<tr><td>${esc(t)}</td>${sc.opts.map(([v])=>`<td class="c ${sc.bad.includes(v)?'no':''}">${c.v===v?'X':''}</td>`).join('')}<td>${esc(c.obs||'')}</td></tr>`}).join('')}${tp.general?`<tr><td><b>Estado general</b></td><td colspan="${sc.opts.length+1}">${{b:'Bueno',r:'Regular',m:'Malo'}[i.general]||''}</td></tr>`:''}</table>`;
+  return `<div class="stack"><div class="stephead"><span class="eyebrow">Inspección ${emerg?'':i.tipo==='preuso'?'preuso ':'periódica '}· ${i.fecha}</span><h1>Registro ${fm.code}</h1><div class="row"><span class="pill ${i.resultado}">${RES[i.resultado]}</span>${i.ejemplo?'<span class="pill ej">Ejemplo</span>':''}</div></div>
+  <p class="note">Así queda el PDF que se archiva en <span class="code">SG-SST JMA / ${fm.dir} / ${e.code}</span>.</p>
   <div class="docwrap"><div class="doc">
-    <table class="hdr"><tr><td rowspan="3" style="width:24%">${LOGO_H?`<img src="${LOGO_H}" alt="J.M.A">`:'<small>Logo J.M.A</small>'}</td><td rowspan="3"><div style="font-size:10px">Sistema de Gestión de la Seguridad y Salud en el Trabajo</div><div class="ttl">FORMATO INSPECCIÓN DE HERRAMIENTAS Y EQUIPOS</div></td><td style="width:24%">Código: <b>FT-SST-057</b></td></tr><tr><td>Versión: 001</td></tr><tr><td>Equipo: ${e.code}</td></tr></table>
-    <table class="sec"><tr><th colspan="4">1. Datos de la inspección y del equipo</th></tr>
-      <tr><td><b>Fecha</b> ${i.fecha} ${i.hora}</td><td><b>Tipo</b> ${i.tipo==='preuso'?'Preuso':'Periódica'}</td><td colspan="2"><b>Obra</b> ${esc(i.obra)}</td></tr>
-      <tr><td><b>Equipo</b> ${tp.n}</td><td><b>Marca</b> ${esc(e.marca)}</td><td><b>Serial</b> ${esc(e.serial)}</td><td><b>Vida útil</b> ${esc(e.vence||'N/A')}</td></tr></table>
-    <table class="sec"><tr><th>2. Lista de chequeo</th><th class="c">C</th><th class="c">NC</th><th class="c">N/A</th><th>Observación</th></tr>${tp.items.map((t,k)=>{const c=i.checks[k]||{};return `<tr><td>${esc(t)}</td><td class="c">${c.v==='c'?'X':''}</td><td class="c no">${c.v==='nc'?'X':''}</td><td class="c">${c.v==='na'?'X':''}</td><td>${esc(c.obs||'')}</td></tr>`}).join('')}</table>
-    <table class="sec"><tr><th colspan="2">3. Resultado</th></tr><tr><td style="width:40%">${i.foto?`<img src="${i.foto}" alt="" style="max-height:120px">`:'Sin foto'}</td><td><b>${RES[i.resultado]}</b>${i.resultado==='fuera'?' · enviado a mantenimiento':''}<br>${esc(i.obs)}</td></tr></table>
-    <table class="sec"><tr><th colspan="2">4. Firmas</th></tr><tr><td><b>Inspector</b><br>${esc(i.inspector.nombre)} · C.C. ${esc(i.inspector.cedula)}<br>${i.inspector.img?`<img src="${i.inspector.img}" alt="">`:''}</td><td><b>Trabajador</b><br>${esc(i.usuario.nombre||'—')} ${i.usuario.cedula?'· C.C. '+esc(i.usuario.cedula):''}<br>${i.usuario.img?`<img src="${i.usuario.img}" alt="">`:''}</td></tr></table>
+    <table class="hdr"><tr><td rowspan="3" style="width:24%">${LOGO_H?`<img src="${LOGO_H}" alt="J.M.A">`:'<small>Logo J.M.A</small>'}</td><td rowspan="3"><div style="font-size:10px">Sistema de Gestión de la Seguridad y Salud en el Trabajo</div><div class="ttl">${fm.title}</div></td><td style="width:24%">Código: <b>${fm.code}</b></td></tr><tr><td>Versión: 001</td></tr><tr><td>Fecha: ${i.fecha} ${i.hora}</td></tr></table>
+    <table class="sec"><tr><th colspan="4">1. Datos de la inspección</th></tr>${datos}</table>
+    ${lista}
+    <table class="sec"><tr><th colspan="2">3. Resultado</th></tr><tr><td style="width:40%">${i.foto?`<img src="${i.foto}" alt="" style="max-height:120px">`:'Sin foto'}</td><td><b>${RES[i.resultado]}</b>${i.resultado==='fuera'?(e.tipo==='EXI'?' · enviado a recarga o mantenimiento':' · enviado a mantenimiento'):''}<br>${esc(i.obs)}</td></tr></table>
+    <table class="sec"><tr><th colspan="2">4. Firmas</th></tr><tr><td><b>${emerg?'Profesional SST':'Inspector'}</b><br>${esc(i.inspector.nombre)} · C.C. ${esc(i.inspector.cedula)}<br>${i.inspector.img?`<img src="${i.inspector.img}" alt="">`:''}</td><td>${emerg?'':`<b>Trabajador</b><br>${esc(i.usuario.nombre||'—')} ${i.usuario.cedula?'· C.C. '+esc(i.usuario.cedula):''}<br>${i.usuario.img?`<img src="${i.usuario.img}" alt="">`:''}`}</td></tr></table>
   </div></div></div>`;
+}
+
+/* --- importar inventario (CSV con la plantilla de J.M.A) --- */
+const IMP_COLS=['tipo','descripcion','cantidad','marca','referencia','modelo','condicion','adquisicion','certultima','certproxima','vidautil','ubicacion','responsable','codigoanterior'];
+function parseCSV(txt){txt=txt.replace(/^\ufeff/,'');const sep=(txt.split('\n')[0].match(/;/g)||[]).length>=(txt.split('\n')[0].match(/,/g)||[]).length?';':',';
+  const rows=[];let row=[],cell='',q=false;for(let i=0;i<txt.length;i++){const c=txt[i];if(q){if(c==='"'){if(txt[i+1]==='"'){cell+='"';i++}else q=false}else cell+=c}else if(c==='"')q=true;else if(c===sep){row.push(cell);cell=''}else if(c==='\n'||c==='\r'){if(c==='\r'&&txt[i+1]==='\n')i++;row.push(cell);rows.push(row);row=[];cell=''}else cell+=c}
+  if(cell||row.length){row.push(cell);rows.push(row)}return rows.filter(r=>r.some(x=>x.trim()))}
+const normH=h=>h.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z]/g,'');
+function normFecha(v){v=(v||'').trim();if(!v)return'';let m=v.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);if(m)return m[1]+'-'+m[2].padStart(2,'0')+'-'+m[3].padStart(2,'0');m=v.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})/);if(m)return m[3]+'-'+m[2].padStart(2,'0')+'-'+m[1].padStart(2,'0');return null}
+function tipoDe(v){v=(v||'').trim();if(TIPOS[v.toUpperCase()])return v.toUpperCase();const n=normH(v);const hit=Object.entries(TIPOS).find(([,t])=>normH(t.n)===n);return hit?hit[0]:null}
+function readImport(txt){
+  const rows=parseCSV(txt);if(rows.length<2)return{error:'El archivo no tiene filas de datos.'};
+  const head=rows[0].map(normH),idx={};IMP_COLS.forEach(c=>{idx[c]=head.indexOf(c)});
+  if(idx.tipo<0)return{error:'No encontré la columna "Tipo". Usa la plantilla de importación.'};
+  const g=(r,c)=>idx[c]>=0?(r[idx[c]]||'').trim():'';const used={};
+  return{items:rows.slice(1).map((r,k)=>{const tipo=tipoDe(g(r,'tipo'));const it={fila:k+2,tipo,raw:g(r,'tipo'),nombre:g(r,'descripcion')||(tipo?TIPOS[tipo].n:''),cantidad:g(r,'cantidad')||'1',marca:g(r,'marca'),serial:g(r,'referencia'),modelo:g(r,'modelo'),condicion:g(r,'condicion'),servicio:normFecha(g(r,'adquisicion')),certUltima:normFecha(g(r,'certultima')),certProxima:normFecha(g(r,'certproxima')),vence:normFecha(g(r,'vidautil')),obra:g(r,'ubicacion'),responsable:g(r,'responsable'),codAnt:g(r,'codigoanterior')};
+    if(!tipo)it.err='Tipo "'+it.raw+'" no reconocido';else if([it.servicio,it.certUltima,it.certProxima,it.vence].includes(null))it.err='Fecha con formato no válido (usa AAAA-MM-DD o DD/MM/AAAA)';
+    if(!it.err&&!it.serial&&!it.codAnt){const k2=tipo+'|'+normH(it.nombre)+'|'+normH(it.marca);used[k2]=(used[k2]||0)+1;if(used[k2]<=S.equipos.filter(e=>e.tipo===tipo&&!e.serial&&!e.codAnt&&normH(e.nombre||'')===normH(it.nombre)&&normH(e.marca||'')===normH(it.marca)).length)it.dup='Ya está en el inventario'}
+    const key=tipo+'|'+(it.serial||it.codAnt);if(!it.err&&(it.serial||it.codAnt)){if(S.equipos.some(e=>e.tipo===tipo&&((it.serial&&e.serial===it.serial)||(it.codAnt&&e.codAnt===it.codAnt))))it.dup='Ya está en el inventario';else if(used[key])it.dup='Repetido en el archivo';used[key]=1}
+    return it})};
+}
+function vImport(){const l=ui.imp||[],ok=l.filter(x=>!x.err&&!x.dup);
+  return `<div class="stephead"><span class="eyebrow">Importar inventario</span><h1>Revisa antes de importar</h1><span class="muted">${l.length} fila(s) leídas · ${ok.length} se importarán. Cada equipo recibe su código y su QR.</span></div>
+  <div class="plist">${l.map(x=>`<div class="eqitem" style="cursor:default"><span class="thumb">${x.tipo||'?'}</span><div class="main"><b>${esc(x.nombre||x.raw)}</b><span style="font-size:13px;color:var(--muted)">${esc([x.marca,x.serial,x.condicion,x.codAnt].filter(Boolean).join(' · '))}${x.certProxima?' · certificada hasta '+x.certProxima:''}</span></div><div class="tags">${x.err?`<span class="pill venc">Fila ${x.fila}: ${esc(x.err)}</span>`:x.dup?`<span class="pill borrador">${esc(x.dup)}</span>`:`<span class="pill apto">Se agrega</span>`}</div></div>`).join('')}</div>`;
 }
 
 /* --- tablero --- */
 function vTablero(){
   const act=S.equipos.filter(e=>e.estado!=='baja');
   const venc=act.filter(e=>{const d=dueState(e);return d&&d.k==='venc'}),prox=act.filter(e=>{const d=dueState(e);return d&&d.k==='prox'});
-  const fuera=act.filter(e=>e.estado==='fuera'),life=act.filter(e=>lifeState(e)),baja=S.equipos.filter(e=>e.estado==='baja');
+  const fuera=act.filter(e=>e.estado==='fuera'||e.estado==='repo'),life=act.filter(e=>lifeState(e)),baja=S.equipos.filter(e=>e.estado==='baja');
   const aptos=act.filter(e=>e.estado==='apto'&&!(dueState(e)||{}).k);
   const month=today().slice(0,7),im=S.insps.filter(i=>i.fecha.slice(0,7)===month&&!i.borrador);
   const att=[...new Set([...fuera,...venc,...prox,...life])];
-  const why=e=>[e.estado==='fuera'?'Fuera de servicio':null,(dueState(e)||{}).l,(lifeState(e)||{}).l].filter(Boolean);
-  const rows=Object.entries(CATS).map(([k,l])=>{const es=S.equipos.filter(e=>TIPOS[e.tipo].cat===k);const c={apto:es.filter(e=>e.estado==='apto').length,fuera:es.filter(e=>e.estado==='fuera').length,baja:es.filter(e=>e.estado==='baja').length};return{l,s:{alturas:'Alturas',electricas:'Eléctricas',manuales:'Manuales'}[k],c,t:es.length}});
+  const why=e=>[e.estado==='fuera'?'Fuera de servicio':e.estado==='repo'?'Requiere reposición':null,(dueState(e)||{}).l,(lifeState(e)||{}).l].filter(Boolean);
+  const rows=Object.entries(CATS).map(([k,l])=>{const es=S.equipos.filter(e=>TIPOS[e.tipo].cat===k);const c={apto:es.filter(e=>e.estado==='apto').length,fuera:es.filter(e=>e.estado==='fuera'||e.estado==='repo').length,baja:es.filter(e=>e.estado==='baja').length};return{l,s:CAT_S[k],c,t:es.length}});
   const max=Math.max(1,...rows.map(r=>r.t));
   return `<div class="stephead"><span class="eyebrow">Programa de inspecciones · PRG-SST-009</span><h1>Tablero de seguimiento</h1><span class="muted">Corte: ${today()}</span></div>
   <div class="stack">
@@ -1073,23 +1233,24 @@ function vTablero(){
       <div class="kpi k-ok"><b>${aptos.length}</b><span>Aptos y al día</span></div>
       <div class="kpi k-bad"><b>${venc.length}</b><span>Inspección vencida</span></div>
       <div class="kpi k-warn"><b>${prox.length}</b><span>Vencen en 7 días</span></div>
-      <div class="kpi k-warn"><b>${fuera.length}</b><span>Fuera de servicio</span></div>
-      <div class="kpi k-bad"><b>${life.length}</b><span>Vida útil por vencer o vencida</span></div>
+      <div class="kpi k-warn"><b>${fuera.length}</b><span>Fuera de servicio o por reponer</span></div>
+      <div class="kpi k-bad"><b>${life.length}</b><span>Vida útil, recargas o botiquines por vencer</span></div>
       <div class="kpi k-az"><b>${im.length}</b><span>Inspecciones este mes</span></div>
     </div>
     <div class="card"><h3>Requieren atención</h3>${att.length?`<div class="plist">${att.map(e=>`<button class="eqitem" data-q="open-eq" data-code="${e.code}">${eqThumb(e)}<div class="main"><span class="code">${e.code}</span><b>${esc(e.nombre||TIPOS[e.tipo].n)}</b><span style="font-size:13px;color:var(--rojo)">${why(e).map(esc).join(' · ')}</span></div><span class="chev" style="color:var(--azul);font-size:22px">›</span></button>`).join('')}</div>`:'<div class="okbox">Todos los equipos están al día.</div>'}</div>
     <div class="card"><h3>Estado por categoría</h3>
-      <div class="legend"><span><i style="background:var(--verde)"></i>Apto</span><span><i style="background:var(--amarillo)"></i>Fuera de servicio</span><span><i style="background:var(--rojo)"></i>Dado de baja</span></div>
+      <div class="legend"><span><i style="background:var(--verde)"></i>Apto</span><span><i style="background:var(--amarillo)"></i>Fuera de servicio o por reponer</span><span><i style="background:var(--rojo)"></i>Dado de baja</span></div>
       <div class="barcat">${rows.map(r=>`<div class="r"><span>${r.s}</span><div class="track" style="width:${r.t/max*100}%">${r.t?['apto','fuera','baja'].map(k=>r.c[k]?`<i style="width:${r.c[k]/r.t*100}%;background:var(--${k==='apto'?'verde':k==='fuera'?'amarillo':'rojo'})" title="${RES[k]}: ${r.c[k]}"></i>`:'').join(''):''}</div><b class="code">${r.t}</b></div>`).join('')}</div></div>
     ${baja.length?`<div class="card"><h3>Dados de baja</h3><div class="hist">${baja.map(e=>`<button data-q="open-eq" data-code="${e.code}"><span><b class="code" style="color:var(--azul)">${e.code}</b> · ${esc(e.nombre||TIPOS[e.tipo].n)}</span><span class="pill baja">Baja</span></button>`).join('')}</div></div>`:''}
+    ${typeof tabEpp==='function'?tabEpp():''}
     ${typeof tabVeh==='function'?tabVeh():''}
     <button class="btn" data-q="csv">Descargar inventario (CSV)</button>
   </div>`;
 }
 async function downloadCSV(){
-  const cols=['Código','Tipo','Categoría','Descripción','Marca','Modelo','Serial','Fabricación','En servicio','Fin vida útil','Obra','Responsable','Estado','Última inspección','Próxima inspección'];
+  const cols=['Código','Tipo','Categoría','Descripción','Marca','Modelo','Serial','Fabricación','En servicio','Fin vida útil','Obra o ubicación','Responsable','Estado','Última inspección','Próxima inspección','Próxima recarga (extintores)'];
   const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
-  const lines=[cols.map(q).join(';'),...S.equipos.map(e=>{const l=lastInsp(e.code);return[e.code,TIPOS[e.tipo].n,CATS[TIPOS[e.tipo].cat],e.nombre,e.marca,e.modelo,e.serial,e.fabricacion,e.servicio,e.vence,e.obra,e.responsable,RES[e.estado],l?l.fecha:'',e.estado==='baja'?'':nextDue(e)||'Ahora'].map(q).join(';')})];
+  const lines=[cols.map(q).join(';'),...S.equipos.map(e=>{const l=lastInsp(e.code);return[e.code,TIPOS[e.tipo].n,CATS[TIPOS[e.tipo].cat],e.nombre,e.marca,e.modelo,e.serial,e.fabricacion,e.servicio,e.vence,e.obra,e.responsable,RES[e.estado],l?l.fecha:'',e.estado==='baja'?'':nextDue(e)||'Ahora',e.proxRecarga||''].map(q).join(';')})];
   const dl=await getDL();if(!dl){toast('La descarga no está disponible en esta vista');return}
   try{await dl.save({filename:`Inventario-equipos-${today()}.csv`,data:'﻿'+lines.join('\r\n')});toast('Inventario descargado')}catch(err){if(err&&err.code!=='declined')toast('No se pudo descargar')}
 }
@@ -1128,19 +1289,32 @@ document.addEventListener('click',ev=>{
   else if(a==='eqnew'){ui.eqf={isNew:true,tipo:'',code:'',nombre:'',marca:'',modelo:'',serial:'',fabricacion:'',servicio:today(),vence:'',obra:'',responsable:'',frecuencia:30,foto:'',estado:'apto'};ui.view='eqform';render()}
   else if(a==='eqedit'){ui.eqf={...EQ(ui.eq),isNew:false};ui.view='eqform';render()}
   else if(a==='eqsave'){const f=ui.eqf;if(!f.tipo){toast('Elige el tipo de equipo');return}if(!(+f.frecuencia>0)){toast('Indica cada cuántos días se inspecciona');return}
-    const{isNew,...data}=f;if(isNew){data.creado=today();S.equipos.push(data)}else Object.assign(EQ(f.code),data);save();ui.eq=f.code;ui.view='equipo';render();toast(isNew?'Equipo registrado con código '+f.code:'Datos guardados')}
+    const{isNew,...data}=f;if(isNew){data.creado=today();if(data.tipo==='BOT')data.contenido=botContenido();S.equipos.push(data)}else Object.assign(EQ(f.code),data);save();ui.eq=f.code;ui.view='equipo';render();toast(isNew?'Equipo registrado con código '+f.code:'Datos guardados')}
   else if(a==='label')downloadLabel();
   else if(a==='csv')downloadCSV();
-  else if(a==='inspnew'){const e=EQ(ui.eq);S.idraft={id:'i'+Date.now(),code:e.code,fecha:today(),hora:new Date().toTimeString().slice(0,5),tipo:'',obra:e.obra||'',checks:{},foto:'',accion:'',obs:'',inspector:{nombre:S.user?S.user.nombre:'',cedula:S.user?S.user.cedula:'',img:''},usuario:{nombre:'',cedula:'',img:''}};ui.step=0;ui.view='insp';save();render()}
+  else if(a==='impok'){const l=(ui.imp||[]).filter(x=>!x.err&&!x.dup);l.forEach(x=>{const{fila,raw,err,dup,...d}=x;S.equipos.push({...d,code:nextCode(d.tipo),obra:d.obra,frecuencia:FREQ[TIPOS[d.tipo].cat],foto:'',estado:'apto',creado:today(),...(d.tipo==='BOT'?{contenido:botContenido()}:{})})});ui.imp=null;save();ui.view='equipos';render();toast(l.length+' equipos importados con su código QR')}
+  else if(a==='inspnew'){const e=EQ(ui.eq),tp=TIPOS[e.tipo];S.idraft={id:'i'+Date.now(),code:e.code,tipoEq:e.tipo,fecha:today(),hora:new Date().toTimeString().slice(0,5),tipo:tp.cat==='emergencia'?'periodica':'',obra:e.obra||'',checks:{},foto:'',accion:'',obs:'',inspector:{nombre:S.user?S.user.nombre:'',cedula:S.user?S.user.cedula:'',img:''},usuario:{nombre:'',cedula:'',img:''}};
+    if(e.tipo==='EXI'){S.idraft.recarga=e.recarga||'';S.idraft.proxRecarga=e.proxRecarga||''}
+    if(tp.kind==='bot'){if(!e.contenido||!e.contenido.length)e.contenido=botContenido();S.idraft.bot=JSON.parse(JSON.stringify(e.contenido))}
+    ui.step=0;ui.view='insp';save();render()}
+  else if(a==='igen')keep(()=>{D().general=b.dataset.v;save()});
+  else if(a==='icert')keep(()=>{D().cert=b.dataset.v;save()});
+  else if(a==='botest')keep(()=>{const it=D().bot.find(x=>x.id===b.dataset.id);it.estado=b.dataset.v;if(it.cant==='')it.cant=it.min;save()});
+  else if(a==='botok')keep(()=>{D().bot.filter(x=>x.sec===b.dataset.sec).forEach(it=>{if(!it.estado)it.estado='b';if(it.cant==='')it.cant=it.min});save()});
   else if(a==='inext'){ui.step++;render()}
   else if(a==='iprev'){ui.step--;render()}
   else if(a==='igoto'){ui.step=+b.dataset.step;render()}
   else if(a==='itipo')keep(()=>{D().tipo=b.dataset.v;save()});
   else if(a==='icheck')keep(()=>{const d=D(),i=b.dataset.i;d.checks[i]=d.checks[i]||{};d.checks[i].v=b.dataset.v;save()});
-  else if(a==='iallc')keep(()=>{const d=D();TIPOS[EQ(d.code).tipo].items.forEach((_,i)=>{d.checks[i]=d.checks[i]||{};if(!d.checks[i].v)d.checks[i].v='c'});save();toast('Los pendientes quedaron en C. Revisa cada uno.')});
+  else if(a==='iallc')keep(()=>{const d=D(),tp=TIPOS[EQ(d.code).tipo],ok=scOf(tp).ok;tp.items.forEach((_,i)=>{d.checks[i]=d.checks[i]||{};if(!d.checks[i].v)d.checks[i].v=ok});save();toast('Los pendientes quedaron en '+scOf(tp).opts[0][1]+'. Revisa cada uno.')});
   else if(a==='iacc')keep(()=>{D().accion=b.dataset.v;save()});
   else if(a==='isign'){const who=b.dataset.who,d=D();signTo(who==='inspector'?'Inspector':'Trabajador: '+d.usuario.nombre,u=>d[who].img=u,d[who].cedula)}
-  else if(a==='isave'){const d=D();if(inspIssues().length)return;d.resultado=inspResult(d);if(d.resultado==='fuera')d.accion='mant';S.insps.push(d);const e=EQ(d.code);e.estado=d.resultado;S.idraft=null;save();ui.insp=d.id;ui.view='inspdoc';render();toast(d.resultado==='apto'?'Inspección guardada: equipo apto':'Inspección guardada: equipo '+RES[d.resultado].toLowerCase())}
+  else if(a==='isave'){const d=D();if(inspIssues().length)return;d.resultado=inspResult(d);if(d.resultado==='fuera')d.accion='mant';const e=EQ(d.code);
+    if(d.obra&&e.obra&&d.obra!==e.obra){d.reubicado=true;d.ubicAnterior=e.obra;e.obra=d.obra}
+    if(e.tipo==='EXI'){e.recarga=d.recarga;e.proxRecarga=d.proxRecarga}
+    if(d.cert==='si'&&d.tipo==='periodica'){e.certUltima=d.fecha;e.certProxima=addYears(d.fecha,1)}
+    if(d.bot)e.contenido=JSON.parse(JSON.stringify(d.bot));
+    S.insps.push(d);e.estado=d.resultado;S.idraft=null;save();ui.insp=d.id;ui.view='inspdoc';render();toast(d.resultado==='apto'?'Inspección guardada: equipo apto':'Inspección guardada: equipo '+RES[d.resultado].toLowerCase())}
   else if(a==='open-insp'){ui.insp=b.dataset.id;ui.view='inspdoc';render()}
 });
 document.addEventListener('input',ev=>{
@@ -1148,7 +1322,7 @@ document.addEventListener('input',ev=>{
   if(t.id==='eqq'){ui.eqq=t.value;const pos=t.selectionStart;render();const n=$('#eqq');n.focus();n.setSelectionRange(pos,pos);return}
   if(dd.ef){ui.eqf[dd.ef]=t.value;return}
   const d=D();if(!d)return;
-  if(dd.iq)d[dd.iq]=t.value;else if(dd.iqu)d.usuario[dd.iqu]=t.value;else if(dd.iqi)d.inspector[dd.iqi]=t.value;else if(dd.iobs){d.checks[dd.iobs].obs=t.value}else return;save();
+  if(dd.bot){const it=d.bot.find(x=>x.id===dd.bot);it[dd.bf]=t.value}else if(dd.iq)d[dd.iq]=t.value;else if(dd.iqu)d.usuario[dd.iqu]=t.value;else if(dd.iqi)d.inspector[dd.iqi]=t.value;else if(dd.iobs){d.checks[dd.iobs].obs=t.value}else return;save();
 });
 document.addEventListener('change',ev=>{
   const t=ev.target;
@@ -1156,6 +1330,7 @@ document.addEventListener('change',ev=>{
   if(t.id==='ef-foto'&&t.files[0])resizePhoto(t.files[0],u=>{ui.eqf.foto=u;keep()});
   if(t.id==='iq-foto'&&t.files[0])resizePhoto(t.files[0],u=>{D().foto=u;save();keep();toast('Foto agregada')});
   if(t.id==='qrfile'&&t.files[0])decodeQR(t.files[0]);
+  if(t.id==='impfile'&&t.files[0]){const fr=new FileReader();fr.onload=()=>{const r=readImport(fr.result);if(r.error){toast(r.error);return}ui.imp=r.items;ui.view='eqimport';render()};fr.readAsText(t.files[0],'utf-8')}
 });
 /* abrir la hoja de vida cuando se llega desde un QR (#JMA-XXX-000) */
 function fromHash(){const c=decodeURIComponent(location.hash.slice(1));if(c&&EQ(c)&&S.user){openEq(c);return true}return false}
@@ -1217,6 +1392,7 @@ function renderV(v,app,bar,bi){
   else if(v==='vform'){app.innerHTML=vForm();bar.hidden=false;bi.innerHTML=`<button class="btn" data-pv="lista">Cancelar</button><button class="btn primary" data-pv="vsave">Guardar vehículo</button>`}
   else if(v==='preop'){app.innerHTML=vPreop();bar.hidden=false;const st=ui.step;bi.innerHTML=`${st===0?'<button class="btn" data-pv="lista">Cancelar</button>':'<button class="btn" data-pv="pprev">Atrás</button>'}${st<3?'<button class="btn primary" data-pv="pnext">Siguiente</button>':`<button class="btn primary" data-pv="psave" ${preIssues().length?'disabled':''}>Guardar preoperacional</button>`}`}
   else if(v==='predoc'){app.innerHTML=vPreDoc();bar.hidden=false;bi.innerHTML=`<button class="btn" data-pv="lista">Vehículos</button><button class="btn primary" data-act="home">Inicio</button>`}
+  else if(typeof renderE==='function')renderE(v,app,bar,bi);
   else if(typeof renderS==='function')renderS(v,app,bar,bi);
 }
 
@@ -1370,6 +1546,121 @@ document.addEventListener('change',ev=>{
   const t=ev.target;
   if(t.id==='pd-foto'&&t.files[0])resizePhoto(t.files[0],u=>{PD().foto=u;save();keep();toast('Foto agregada')});
   if(t.dataset.pe)keep();
+});
+if(ui.view==='home')render();
+</script>
+
+<script>
+/* =================== Módulo: inspección de EPP por trabajador · FT-SST-061 =================== */
+const EPP=[['casco','Casco de seguridad','Casco'],['lentes','Lentes de seguridad','Lentes'],['auditivo','Protector auditivo','Auditivo'],['respirador','Respirador / mascarilla','Respirador'],['vaqueta','Guantes de vaqueta','G. vaqueta'],['soldar','Guantes para soldar','G. soldar'],['careta','Protección facial (careta)','Careta'],['botas','Botas punta de acero','Botas acero'],['dielectricas','Botas dieléctricas','Botas dielect.'],['chaleco','Chaleco reflectivo','Chaleco']];
+const EPP_BASICOS=['casco','lentes','vaqueta','botas','chaleco'];
+const CONTROLES=['Socialización en el puesto','Reposición del EPP','Capacitación en uso y cuidado','Llamado de atención','Otro'];
+S.epps=S.epps||[];S.personas=S.personas||{};
+if(!PROD&&!S.seedEpp){const w=(ced,n,c,bad)=>{const it={};EPP.forEach(([k])=>it[k]=EPP_BASICOS.includes(k)?{uso:'si',est:'b'}:{uso:'na'});Object.assign(it,bad||{});return{id:uid(),cedula:ced,nombre:n,cargo:c,items:it,control:bad?['Reposición del EPP']:[],obs:bad?'Casco con fisura; se entrega uno nuevo':'',firma:''}};
+  S.epps.push({id:'epp-ej',consecutivo:1,fecha:addDays(today(),-4),hora:'07:30',sede:'Edificio Mirador',inspector:{nombre:'Coordinador SST',cedula:'',cargo:'Coordinador SST',img:''},workers:[w('1010','Carlos Pérez','Oficial',{casco:{uso:'si',est:'m'}}),w('1020','Andrés Gómez','Ayudante')],comentarios:'',status:'cerrado',ejemplo:true});S.seedEpp=true;save()}
+const EP=()=>S.epps.find(x=>x.id===ui.epp);
+const wHall=w=>EPP.filter(([k])=>{const i=w.items[k]||{};return i.uso==='no'||i.est==='m'||i.est==='r'});
+const wDone=w=>w.nombre&&w.cedula&&EPP.every(([k])=>{const i=w.items[k]||{};return i.uso==='na'||i.uso==='no'||(i.uso==='si'&&i.est)})&&(!wHall(w).length||(w.control.length&&(w.obs||'').trim()))&&w.firma;
+
+function homeE(){const n=S.epps.filter(x=>x.status==='borrador').length;
+  return `<button class="newcard" data-ep="list" style="border-color:var(--amarillo)"><span class="plus" style="background:var(--amarillo);color:var(--negro)">+</span><span><b>Inspección de EPP</b><span class="code">FT-SST-061 · por trabajador${n?' · '+n+' en curso':''}</span></span></button>`}
+
+function renderE(v,app,bar,bi){
+  if(v==='epplist'){app.innerHTML=vEppList();bar.hidden=false;bi.innerHTML=`<button class="btn" data-act="home">Inicio</button><button class="btn primary" data-ep="new">+ Nueva inspección</button>`}
+  else if(v==='epp'){app.innerHTML=vEpp();bar.hidden=false;const p=EP();bi.innerHTML=`<button class="btn" data-ep="list">Guardar y salir</button><button class="btn primary" data-ep="close" ${eppIssues(p).length?'disabled':''}>Cerrar inspección</button>`}
+  else if(v==='eppw'){app.innerHTML=vEppW();bar.hidden=false;bi.innerHTML=`<button class="btn" data-ep="back">Volver</button><button class="btn primary" data-ep="wsave">Listo</button>`}
+  else if(v==='eppdoc'){app.innerHTML=vEppDoc();bar.hidden=false;bi.innerHTML=`<button class="btn" data-ep="list">Inspecciones de EPP</button><button class="btn primary" data-act="home">Inicio</button>`}
+  else if(typeof renderS==='function')renderS(v,app,bar,bi);
+}
+
+function vEppList(){
+  const l=[...S.epps].sort((a,b)=>(b.fecha+b.hora).localeCompare(a.fecha+a.hora));
+  return `<div class="stephead"><span class="eyebrow">FT-SST-061</span><h1>Inspección de EPP</h1><span class="muted">Una inspección por sede u obra. Agregas a cada trabajador, revisas el uso y el estado de su EPP, y firma.</span></div>
+  <div class="plist">${l.length?l.map(p=>{const h=p.workers.filter(w=>wHall(w).length).length;return `<button class="pitem" data-ep="open" data-id="${p.id}"><div class="main"><b>${esc(p.sede||'Sin sede')}</b><span class="sub">${p.fecha} · ${p.workers.length} trabajador(es)${h?' · '+h+' con hallazgos':''}</span></div><div class="tags"><span class="pill ${p.status==='cerrado'?'cerrado':'borrador'}">${p.status==='cerrado'?'Cerrada':'En curso'}</span>${p.ejemplo?'<span class="pill ej">Ejemplo</span>':''}</div><span class="chev">›</span></button>`}).join(''):'<p class="muted">Todavía no hay inspecciones de EPP. Crea la primera con el botón de abajo.</p>'}</div>`;
+}
+function eppIssues(p){const o=[];if(!p.sede||!p.fecha)o.push('Falta la sede u obra.');if(!p.workers.length)o.push('Agrega al menos un trabajador.');p.workers.forEach((w,i)=>{if(!wDone(w))o.push(`${w.nombre||'Trabajador '+(i+1)}: falta completar EPP, acción o firma.`)});if(!p.inspector.nombre||!p.inspector.img)o.push('Falta el nombre o la firma del responsable de la inspección.');return o}
+function vEpp(){
+  const p=EP(),iss=eppIssues(p);
+  return `<div class="stephead"><span class="eyebrow">Inspección de EPP · <span class="code">FT-SST-061</span></span><h1>${esc(p.sede||'Nueva inspección')}</h1><span class="saved" id="savedat">${stamp()}</span></div>
+  <div class="stack">
+    <div class="card"><div class="grid2">
+      <label class="f"><span class="req">Sede u obra</span><input class="in" id="ep-sede" data-epf="sede" value="${esc(p.sede)}"></label>
+      <label class="f"><span class="req">Fecha</span><input class="in" type="date" id="ep-fecha" data-epf="fecha" value="${esc(p.fecha)}"></label></div></div>
+    <div class="card"><div class="row" style="justify-content:space-between"><h3>Trabajadores (${p.workers.length})</h3></div>
+      ${p.workers.length?`<div class="plist">${p.workers.map((w,i)=>{const h=wHall(w),ok=wDone(w);return `<button class="pitem" data-ep="wopen" data-i="${i}"><div class="main"><b>${esc(w.nombre||'Sin nombre')}</b><span class="sub">${esc(w.cargo||'')} ${w.cedula?'· C.C. '+esc(w.cedula):''}${h.length?' · '+h.map(x=>x[2]).join(', '):''}</span></div><div class="tags">${!ok?'<span class="pill borrador">Incompleto</span>':h.length?'<span class="pill repo">Con hallazgos</span>':'<span class="pill apto">Conforme</span>'}</div><span class="chev">›</span></button>`}).join('')}</div>`:'<p class="muted" style="margin:0">Agrega al primer trabajador.</p>'}
+      <button class="btn" data-ep="wnew">+ Agregar trabajador</button></div>
+    <div class="card"><h3>Responsable de la inspección</h3>
+      <div class="grid2"><label class="f"><span class="req">Nombre</span><input class="in" id="ep-in" data-epi="nombre" value="${esc(p.inspector.nombre)}"></label><label class="f">Cargo<input class="in" id="ep-ic" data-epi="cargo" value="${esc(p.inspector.cargo)}"></label></div>
+      <label class="f">Comentarios<textarea class="in" id="ep-com" data-epf="comentarios">${esc(p.comentarios)}</textarea></label>
+      <button type="button" class="sigbox ${p.inspector.img?'has':''}" data-ep="isign">${p.inspector.img?`<img src="${p.inspector.img}" alt="">`:'Firma del inspector'}</button></div>
+    ${iss.length&&p.workers.length?`<div class="card"><h3>Para cerrar falta</h3>${iss.map(m=>`<div class="issue"><b>●</b><span>${esc(m)}</span></div>`).join('')}</div>`:''}
+  </div>`;
+}
+function vEppW(){
+  const p=EP(),w=p.workers[ui.wi],h=wHall(w);
+  return `<div class="stephead"><span class="eyebrow">${esc(p.sede)} · FT-SST-061</span><h1>${esc(w.nombre||'Trabajador')}</h1></div>
+  <div class="stack">
+    <div class="card"><div class="grid2">
+      <label class="f"><span class="req">Cédula</span><input class="in" id="ew-ced" inputmode="numeric" data-ew="cedula" value="${esc(w.cedula)}"></label>
+      <label class="f"><span class="req">Apellidos y nombres</span><input class="in" id="ew-nom" data-ew="nombre" value="${esc(w.nombre)}"></label>
+      <label class="f">Cargo<input class="in" id="ew-car" data-ew="cargo" value="${esc(w.cargo)}" placeholder="Oficial, ayudante…"></label></div></div>
+    <div class="row" style="justify-content:space-between"><span class="muted" style="font-size:14px">Uso: ¿lo tiene puesto? · Estado: B bueno, R regular, M malo</span><button class="btn small primary" data-ep="basicos">Básicos en uso y buenos</button></div>
+    <p class="muted" style="margin:-8px 0 0;font-size:13px">"Básicos" marca casco, lentes, guantes de vaqueta, botas y chaleco en uso y buen estado; lo demás queda como no requerido. Ajusta lo que aplique a su tarea.</p>
+    <div class="items">${EPP.map(([k,l])=>{const it=w.items[k]||{};const cls=it.uso==='no'||it.est==='m'?'v-m':it.est==='r'?'v-r':it.uso==='si'&&it.est?'v-b':it.uso==='na'?'v-na':'';return `<div class="item ${cls}"><p>${l}</p>
+      <div class="seg sm">${[['si','Lo usa'],['no','No lo usa'],['na','No requerido']].map(([v,t])=>`<button type="button" data-ep="uso" data-k="${k}" data-v="${v}" aria-pressed="${it.uso===v}">${t}</button>`).join('')}</div>
+      ${it.uso==='si'?`<div class="tri cnc">${[['b','B'],['r','R'],['m','M']].map(([v,t])=>`<button type="button" data-ep="est" data-k="${k}" data-v="${v}" aria-pressed="${it.est===v}">${t}</button>`).join('')}</div>`:''}</div>`}).join('')}</div>
+    ${h.length?`<div class="card"><h3>Métodos de control</h3><p class="muted" style="margin:0;font-size:14px">Hallazgos: ${h.map(x=>x[1]).join(', ')}.</p>
+      <div class="chips">${CONTROLES.map(c=>`<button type="button" class="chip" data-ep="ctrl" data-v="${c}" aria-pressed="${w.control.includes(c)}">${c}</button>`).join('')}</div>
+      <label class="f"><span class="req">Observación</span><textarea class="in" id="ew-obs" data-ew="obs" placeholder="Qué se encontró y qué se hizo">${esc(w.obs)}</textarea></label></div>`:''}
+    <div class="card"><h3>Firma del trabajador</h3><button type="button" class="sigbox ${w.firma?'has':''}" data-ep="wsign">${w.firma?`<img src="${w.firma}" alt="">`:regGet(w.cedula)?'Toca para firmar · tiene firma registrada':'Toca para firmar'}</button></div>
+    ${p.workers.length>1||w.nombre?`<button class="link" data-ep="wdel" style="align-self:flex-start;color:var(--rojo)">Quitar a este trabajador de la inspección</button>`:''}
+  </div>`;
+}
+function vEppDoc(){
+  const p=EP();
+  const cell=it=>{if(!it||it.uso==='na')return['NA',''];return[it.uso==='si'?'SÍ':'NO',it.uso==='si'?(it.est||'').toUpperCase():'']};
+  return `<div class="stack"><div class="stephead"><span class="eyebrow">Inspección de EPP · ${p.fecha}</span><h1>Registro FT-SST-061</h1>${p.ejemplo?'<span class="pill ej" style="align-self:flex-start">Ejemplo</span>':''}</div>
+  <p class="note">Así queda el PDF que se archiva en <span class="code">SG-SST JMA / E4.2.4 Inspecciones / FT-SST-061</span>.</p>
+  <div class="docwrap"><div class="doc">
+    <table class="hdr"><tr><td rowspan="3" style="width:20%">${LOGO_H?`<img src="${LOGO_H}" alt="J.M.A">`:'<small>Logo J.M.A</small>'}</td><td rowspan="3"><div style="font-size:10px">Sistema de Gestión de la Seguridad y Salud en el Trabajo</div><div class="ttl">FORMATO INSPECCIÓN DE ELEMENTOS DE PROTECCIÓN PERSONAL</div></td><td style="width:22%">Código: <b>FT-SST-061</b></td></tr><tr><td>Versión: 001</td></tr><tr><td>N.° ${numOf(p)}</td></tr></table>
+    <table class="sec"><tr><td><b>Responsable</b> ${esc(p.inspector.nombre)}</td><td><b>Cargo</b> ${esc(p.inspector.cargo)}</td><td><b>Sede</b> ${esc(p.sede)}</td><td><b>Fecha</b> ${p.fecha}</td></tr></table>
+    <table class="sec" style="font-size:9px"><tr><th rowspan="2">N°</th><th rowspan="2">Apellidos y nombres</th>${EPP.map(x=>`<th colspan="2" class="c" style="width:auto">${x[2]}</th>`).join('')}<th rowspan="2">Métodos de control</th><th rowspan="2">Firma</th></tr>
+      <tr>${EPP.map(()=>'<th class="c">U</th><th class="c">E</th>').join('')}</tr>
+      ${p.workers.map((w,i)=>`<tr><td>${i+1}</td><td>${esc(w.nombre)}<br><span style="font-size:8px">C.C. ${esc(w.cedula)} · ${esc(w.cargo)}</span></td>${EPP.map(([k])=>{const[u,e]=cell(w.items[k]);return `<td class="c ${u==='NO'?'no':''}">${u}</td><td class="c ${e==='M'?'no':''}">${e}</td>`}).join('')}<td>${esc(w.control.join(', '))}${w.obs?'<br>'+esc(w.obs):''}</td><td class="dsig">${w.firma?`<img src="${w.firma}" alt="">`:''}</td></tr>`).join('')}</table>
+    <table class="sec"><tr><td><b>Convenciones:</b> U = uso (SÍ, NO, NA no requerido) · E = estado (B bueno, R regular, M malo)</td></tr><tr><td><b>Comentarios</b> ${esc(p.comentarios||'Ninguno')}</td></tr><tr><td><b>Nombre y firma del inspector</b> ${esc(p.inspector.nombre)}<br>${p.inspector.img?`<img src="${p.inspector.img}" alt="">`:''}</td></tr></table>
+  </div></div></div>`;
+}
+function tabEpp(){
+  const rep=[];S.epps.filter(p=>p.status==='cerrado').forEach(p=>p.workers.forEach(w=>{const h=wHall(w);if(h.length)rep.push({p,w,h})}));
+  rep.sort((a,b)=>b.p.fecha.localeCompare(a.p.fecha));
+  return `<div class="card"><h3>EPP con hallazgos</h3>${rep.length?`<div class="hist">${rep.slice(0,8).map(r=>`<button data-ep="open" data-id="${r.p.id}"><span>${esc(r.w.nombre)} · ${r.p.fecha}<br><span class="muted" style="font-size:13px">${r.h.map(x=>x[1]).join(', ')}${r.w.control.length?' → '+esc(r.w.control.join(', ')):''}</span></span><span class="pill ${r.w.control.includes('Reposición del EPP')?'repo':'prox'}">${r.w.control.includes('Reposición del EPP')?'Reponer':'Seguimiento'}</span></button>`).join('')}</div>`:'<div class="okbox">Sin hallazgos en las inspecciones de EPP.</div>'}</div>`;
+}
+
+document.addEventListener('click',ev=>{
+  const b=ev.target.closest('[data-ep]');if(!b)return;const a=b.dataset.ep,p=EP();
+  if(a==='list'){ui.view='epplist';render()}
+  else if(a==='new'){const n={id:'e'+Date.now(),consecutivo:S.epps.length+1,fecha:today(),hora:new Date().toTimeString().slice(0,5),sede:'',inspector:{nombre:S.user?S.user.nombre:'',cedula:S.user?S.user.cedula:'',cargo:S.user?S.user.rol:'',img:''},workers:[],comentarios:'',status:'borrador'};S.epps.push(n);ui.epp=n.id;ui.view='epp';save();render()}
+  else if(a==='open'){ui.epp=b.dataset.id;ui.view=EP().status==='cerrado'?'eppdoc':'epp';render()}
+  else if(a==='wnew'){const it={};p.workers.push({id:uid(),cedula:'',nombre:'',cargo:'',items:it,control:[],obs:'',firma:''});ui.wi=p.workers.length-1;ui.view='eppw';save();render()}
+  else if(a==='wopen'){ui.wi=+b.dataset.i;ui.view='eppw';render()}
+  else if(a==='back'||a==='wsave'){const w=p.workers[ui.wi];if(w&&w.cedula&&w.nombre)S.personas[w.cedula]={nombre:w.nombre,cargo:w.cargo};if(a==='wsave'&&!wDone(w))toast('Quedó guardado, pero falta completar EPP, acción o firma');ui.view='epp';save();render()}
+  else if(a==='wdel'){p.workers.splice(ui.wi,1);ui.view='epp';save();render()}
+  else if(a==='basicos')keep(()=>{const w=p.workers[ui.wi];EPP.forEach(([k])=>{if(!w.items[k]||!w.items[k].uso)w.items[k]=EPP_BASICOS.includes(k)?{uso:'si',est:'b'}:{uso:'na'}});save()});
+  else if(a==='uso')keep(()=>{const w=p.workers[ui.wi],k=b.dataset.k;w.items[k]={uso:b.dataset.v,est:b.dataset.v==='si'?((w.items[k]||{}).est||''):''};save()});
+  else if(a==='est')keep(()=>{const w=p.workers[ui.wi];w.items[b.dataset.k].est=b.dataset.v;save()});
+  else if(a==='ctrl')keep(()=>{const w=p.workers[ui.wi],c=b.dataset.v;w.control=w.control.includes(c)?w.control.filter(x=>x!==c):[...w.control,c];save()});
+  else if(a==='wsign'){const w=p.workers[ui.wi];signTo('Trabajador: '+(w.nombre||''),u=>{w.firma=u},w.cedula)}
+  else if(a==='isign')signTo('Inspector: '+(p.inspector.nombre||''),u=>{p.inspector.img=u},p.inspector.cedula);
+  else if(a==='close'){if(eppIssues(p).length)return;p.status='cerrado';save();ui.view='eppdoc';render();toast('Inspección de EPP cerrada')}
+});
+document.addEventListener('input',ev=>{
+  const t=ev.target,d=t.dataset,p=EP();if(!p)return;
+  if(d.epf)p[d.epf]=t.value;else if(d.epi)p.inspector[d.epi]=t.value;else if(d.ew)p.workers[ui.wi][d.ew]=t.value;else return;save();
+});
+document.addEventListener('change',ev=>{
+  const t=ev.target,p=EP();if(!p||t.id!=='ew-ced')return;const w=p.workers[ui.wi],c=t.value.trim();
+  const known=S.personas[c]||(S.usuarios||[]).find(u=>String(u.cedula)===c)||(S.conductores||[]).find(u=>u.cedula===c);
+  if(known&&!w.nombre){w.nombre=known.nombre;w.cargo=w.cargo||known.cargo||known.rol||'';save();keepFocus()}else if(regGet(c))keepFocus();
 });
 if(ui.view==='home')render();
 </script>
